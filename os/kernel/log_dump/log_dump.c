@@ -206,14 +206,16 @@ int log_dump_compress_lastblock(void)
 	}
 
 	last_comp_block_size = CONFIG_LOG_DUMP_CHUNK_SIZE;
-
+#ifdef CONFIG_LOG_DUMP_COMPRESSION
 	compress_ret = compress_block(&last_comp_block[4], &last_comp_block_size, uncomp_buf[uncomp_idx], uncomp_curbytes);
 
 	if (compress_ret != LOG_DUMP_OK) {
 		lldbg("Fail to compress compress_ret = %d\n", compress_ret);
 		return -compress_ret;
 	}
-
+#else
+	memcpy(&last_comp_block[4], uncomp_buf[uncomp_idx], CONFIG_LOG_DUMP_CHUNK_SIZE);
+#endif
 	snprintf(comp_size, LOG_DUMP_COMPRESS_NODESZ, "%04d", last_comp_block_size);
 	for (int i = 0; i < LOG_DUMP_COMPRESS_NODESZ - 1; i++) {
 		last_comp_block[i] = comp_size[i];
@@ -265,7 +267,6 @@ int log_dump_set(FAR const char *buffer, size_t buflen)
 static int log_dump_tobuffer(char ch, size_t *free_size)
 {
 	/* need to check if the current chunks size is over max_log_size or greater than x% of free heap */
-
 	size_t max_size;
 
 #ifdef CONFIG_DEBUG_MM_HEAPINFO
@@ -364,12 +365,12 @@ static int compress_full_bufs(void)
 			continue;
 		}
 		size_t free_size = 0;
-		int msg_compress = false;
-		/* compress the block, add it to the nodes, reset the uncomp_buf */
 		set_comp_head = true;
-		compress_full_block = true;
 		comp_idx = i;
-
+#ifdef CONFIG_LOG_DUMP_COMPRESSION
+		/* compress the block, add it to the nodes, reset the uncomp_buf */
+		int msg_compress = false;
+		compress_full_block = true;
 		mq_send(mq_fd, (const char *)&msg_compress, sizeof(int), 100);
 
 		/* wait for completion of the current full block compression */
@@ -383,6 +384,9 @@ static int compress_full_bufs(void)
 			lldbg("Fail to compress ret = %d\n", compress_ret);
 			return compress_ret;
 		}
+#else
+		memcpy(out_buf, (unsigned char *)uncomp_buf[comp_idx], CONFIG_LOG_DUMP_CHUNK_SIZE);
+#endif
 		snprintf(comp_size, LOG_DUMP_COMPRESS_NODESZ, "%04d", writesize);
 		for (int m = 0; m < LOG_DUMP_COMPRESS_NODESZ - 1; m++) {
 			ret = log_dump_tobuffer(comp_size[m], &free_size);
@@ -396,7 +400,6 @@ static int compress_full_bufs(void)
 				}
 			}
 		}
-
 		for (int write_idx = 0; write_idx < writesize; write_idx++) {
 			ret = log_dump_tobuffer(out_buf[write_idx], &free_size);
 			if (ret < 0) {
@@ -425,7 +428,6 @@ int log_dump_save(char ch)
 	if (is_started_to_save == false) {
 		return LOG_DUMP_OK;
 	}
-
 	/* If the uncompress buffer is already full and not released because
 	 * the compression is blocked by kernel heap lock, then we will not
 	 * accept any more data into the uncompress buffer.
@@ -526,7 +528,6 @@ int log_dump(int argc, char *argv[])
 		mq_close(mq_fd);
 		return 0;
 	}
-
 	int msg_compress;
 	int nbytes;
 

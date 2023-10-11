@@ -32,6 +32,7 @@
 #define COMP_FAILURE            2
 #define COMP_INVALID_INPUT      3
 #define COMP_USAGE_ERROR        4
+#define COMP_DRVPATH		"/dev/compress"
 
 /****************************************************************************
  * Public Types
@@ -53,4 +54,46 @@ struct s_header {
 	int binary_size;			/* Uncompressed file size */
 	int secoff[];				/* Offsets to Compressed blocks */
 };
+
+/* compress ioctl argument data struct */
+struct compress_header {
+	long unsigned int input_size;
+	unsigned char *input_buffer;
+	long unsigned int output_size;
+	unsigned char *output_buffer;
+};
+
+/****************************************************************************
+ * Name: compress_register
+ *
+ * Description:
+ *   Register compress driver path, MMINFO_DRVPATH
+ *
+ ****************************************************************************/
+void compress_register(void);
+
+/****************************************************************************
+ * Name: compress_block
+ *
+ * Description:
+ *   compresses block in 'read_buffer' of readsize into 'out_buffer' of writesize
+ *
+ * Returned Value:
+ *   Non-negative value on Success.
+ *   Negative value on Failure.
+ ****************************************************************************/
+int compress_block(unsigned char *out_buffer, long unsigned int *writesize, unsigned char *read_buffer, long unsigned int size);
+
+/****************************************************************************
+ * Name: decompress_block
+ *
+ * Description:
+ *   Decompress block in 'read_buffer' of readsize into 'out_buffer' of writesize
+ *
+ * Returned Value:
+ *   Non-negative value on Success.
+ *   Negative value on Failure.
+ ****************************************************************************/
+int decompress_block(unsigned char *out_buffer, long unsigned int *writesize, unsigned char *read_buffer, long unsigned int *size);
+
 #endif						/* __INCLUDE_COMPRESSION_H */

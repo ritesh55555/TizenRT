@@ -75,7 +75,9 @@ static ssize_t comp_write(FAR struct file *filep, FAR const char *buffer, size_t
  * Arguments:
  * 	 filep is ioctl fd, cmd is required command, arg is required argument for
  * 	 the command. For compression and decompression, arg is a struct compress_header
- * 	 pointer in which user stores input_buffer, input_size data. 
+ * 	 pointer in which user stores input_buffer, input_size data.
+ * 	 For compression and decompression, It is required to allocate output_buffer and 
+ * 	 assign output_size of struct compress_header argument before passing to the function. 
  * 	 For getting compression_type, arg is NULL.
  *
  * Description:
@@ -89,7 +91,7 @@ static int comp_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 	int ret = -ENOSYS;
 	struct compress_header *comp_info = (struct compress_header *)arg;
 
-	DEBUGASSERT(comp_info);
+	//DEBUGASSERT(comp_info);
 	/* Handle built-in ioctl commands */
 	switch (cmd) {
 	case COMPIOC_COMPRESS:
@@ -99,7 +101,18 @@ static int comp_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 		/* CONFIG_COMPRESSION_TYPE 1 for LZMA and 2 for MINIZ */
 		ret = CONFIG_COMPRESSION_TYPE;
 		break;
-	case COMPIOC_DECOMPRESS:
+	case COMPIOC_GET_COMP_NAME:
+		switch (CONFIG_COMPRESSION_TYPE) {
+			case LZMA_TYPE:
+				memcpy((char *)arg, LZMA_NAME, COMP_NAME_SIZE);
+				break;
+			case MINIZ_TYPE:
+				memcpy((char *)arg, MINIZ_NAME, COMP_NAME_SIZE);
+				break;
+		}
+		ret = OK;
+		break;
+ 	case COMPIOC_DECOMPRESS:
 		ret = decompress_block(comp_info->output_buffer, &comp_info->output_size, comp_info->input_buffer, &comp_info->input_size);
 		break;
 	}

@@ -34,6 +34,13 @@
 #define COMP_USAGE_ERROR        4
 #define COMP_DRVPATH		"/dev/compress"
 
+#define LZMA_TYPE	        1
+#define LZMA_NAME               "LZMA"
+
+#define MINIZ_TYPE		2
+#define MINIZ_NAME              "MINIZ"
+#define COMP_NAME_SIZE          6
+
 /****************************************************************************
  * Public Types
  ****************************************************************************/

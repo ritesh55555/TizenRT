@@ -64,6 +64,7 @@ int tc_compression_main(int argc, char *argv[])
 	/*If FAIL : Failed to open compression driver*/
 	if (g_comp_tc_fd < 0) {
 		printf("Failed to open compression driver %d\n", errno);
+		close(g_tc_fd);
 		return ERROR;
 	}
 	

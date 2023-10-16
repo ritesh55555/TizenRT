@@ -440,7 +440,8 @@
 
 #define COMPIOC_COMPRESS           _COMPIOC(0x0001)
 #define COMPIOC_GET_COMP_TYPE      _COMPIOC(0x0002)
-#define COMPIOC_DECOMPRESS	   _COMPIOC(0x0003)
+#define COMPIOC_GET_COMP_NAME      _COMPIOC(0x0003)
+#define COMPIOC_DECOMPRESS	   _COMPIOC(0x0004)
 
 /* Cpuload driver ioctl definitions ************************/
 

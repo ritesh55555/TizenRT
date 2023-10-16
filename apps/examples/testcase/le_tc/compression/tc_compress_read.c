@@ -35,6 +35,7 @@
 
 static struct compress_header *comp_tc_data;
 static struct compress_header *decomp_tc_data;
+static char *tc_comp_type_name;
 
 static void uninitialize_tc_data(void)
 {
@@ -45,6 +46,7 @@ static void uninitialize_tc_data(void)
 	free(decomp_tc_data->output_buffer);
 	free(comp_tc_data);
 	free(decomp_tc_data);
+	free(tc_comp_type_name);
 }
 
 static int initialize_tc_data(void)
@@ -83,6 +85,8 @@ static int initialize_tc_data(void)
 	if (decomp_tc_data->output_buffer == NULL) {
 		goto exit_with_decomp_output;	
 	}
+
+	tc_comp_type_name = (char *)malloc(10);
 	
 	return OK;
 	
@@ -142,6 +146,15 @@ static void tc_comp_decomp_buffer(void)
 	// Test to check compression type 
 	ret_chk = ioctl(fd, COMPIOC_GET_COMP_TYPE, NULL);
 	TC_ASSERT_EQ_CLEANUP("compression_type_check", ret_chk, CONFIG_COMPRESSION_TYPE, uninitialize_tc_data());
+
+	// Test to check compression type string name
+	ret_chk = ioctl(fd, COMPIOC_GET_COMP_NAME, tc_comp_type_name);
+	TC_ASSERT_EQ_CLEANUP("compression type string check", ret_chk, OK, uninitialize_tc_data());
+	if ( CONFIG_COMPRESSION_TYPE == MINIZ_TYPE) {
+		TC_ASSERT_EQ_CLEANUP("compression type string check", strcmp(tc_comp_type_name, MINIZ_NAME), OK, uninitialize_tc_data());
+	} else {
+		TC_ASSERT_EQ_CLEANUP("compression type string check", strcmp(tc_comp_type_name, LZMA_NAME), OK, uninitialize_tc_data());
+	}	
 	
 	// Test compression method 
 	ret_chk = ioctl(fd, COMPIOC_COMPRESS, comp_tc_data);

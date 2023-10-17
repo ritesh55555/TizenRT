@@ -71,6 +71,7 @@ static ssize_t comp_write(FAR struct file *filep, FAR const char *buffer, size_t
  * 	 COMPIOC_COMPRESS - for compression of input data
  * 	 COMPIOC_DECOMPRESS - for decompression of input data
  * 	 COMPIOC_GET_COMP_TYPE - for getting compression type
+ * 	 COMPIOC_GET_COMP_NAME - for getting compression type in string
  *
  * Arguments:
  * 	 filep is ioctl fd, cmd is required command, arg is required argument for
@@ -79,11 +80,15 @@ static ssize_t comp_write(FAR struct file *filep, FAR const char *buffer, size_t
  * 	 For compression and decompression, It is required to allocate output_buffer and 
  * 	 assign output_size of struct compress_header argument before passing to the function. 
  * 	 For getting compression_type, arg is NULL.
+ * 	 For getting compression_name, arg is a char pointer which has already been 
+ * 	 allocated memory.
  *
  * Description:
  * 	 The ioctl method for compress apis. For compression and decompression,
  * 	 ouput result is stored in outpu_buffer and output_size of arg(struct compress_header *).
  * 	 For compression type, it just returns the compression type value.
+ * 	 For compression name, it stores the string in the char pointer that has been
+ * 	 cast to arg.
  *
  ************************************************************************************/
 static int comp_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
@@ -105,9 +110,11 @@ static int comp_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 		switch (CONFIG_COMPRESSION_TYPE) {
 			case LZMA_TYPE:
 				memcpy((char *)arg, LZMA_NAME, COMP_NAME_SIZE);
+				printf("compression type is %s\n", (char *)arg);
 				break;
 			case MINIZ_TYPE:
 				memcpy((char *)arg, MINIZ_NAME, COMP_NAME_SIZE);
+				printf("compression type is %s\n", (char *)arg);
 				break;
 		}
 		ret = OK;

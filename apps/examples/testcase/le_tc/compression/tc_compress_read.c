@@ -78,18 +78,23 @@ static int initialize_tc_data(void)
 		goto exit_with_decomp;
 	}
 		
-	decomp_tc_data->input_buffer = comp_tc_data->output_buffer;
-	decomp_tc_data->input_size = comp_tc_data->output_size;
-	decomp_tc_data->output_size = comp_tc_data->input_size;
-	decomp_tc_data->output_buffer = (unsigned char *)malloc(comp_tc_data->input_size);
-	if (decomp_tc_data->output_buffer == NULL) {
-		goto exit_with_decomp_output;	
-	}
+	// decomp_tc_data->input_buffer = comp_tc_data->output_buffer;
+	// decomp_tc_data->input_size = comp_tc_data->output_size;
+	// decomp_tc_data->output_size = comp_tc_data->input_size;
+	// decomp_tc_data->output_buffer = (unsigned char *)malloc(comp_tc_data->input_size);
+	// if (decomp_tc_data->output_buffer == NULL) {
+	// 	goto exit_with_decomp_output;	
+	// }
 
 	tc_comp_type_name = (char *)malloc(10);
+	if (tc_comp_type_name == NULL) {
+		goto exit_with_comp_type_name;
+	}
 	
 	return OK;
 	
+exit_with_comp_type_name:
+	free(decomp_tc_data->output_buffer);
 exit_with_decomp_output:
 	free(decomp_tc_data);
 exit_with_decomp:
@@ -154,15 +159,29 @@ static void tc_comp_decomp_buffer(void)
 		TC_ASSERT_EQ_CLEANUP("compression type string check", strcmp(tc_comp_type_name, MINIZ_NAME), OK, uninitialize_tc_data());
 	} else {
 		TC_ASSERT_EQ_CLEANUP("compression type string check", strcmp(tc_comp_type_name, LZMA_NAME), OK, uninitialize_tc_data());
-	}	
+	}
+	printf("compression type name is %s\n\n", tc_comp_type_name);
 	
 	// Test compression method 
 	ret_chk = ioctl(fd, COMPIOC_COMPRESS, comp_tc_data);
 	TC_ASSERT_EQ_CLEANUP("compress block", ret_chk, OK, uninitialize_tc_data());
+	printf("After compression: \n");
+	printf("input size for compression: %d\n", comp_tc_data->input_size);
+	printf("output size after compression: %d\n\n", comp_tc_data->output_size);
+
+	decomp_tc_data->input_buffer = comp_tc_data->output_buffer;
+	decomp_tc_data->input_size = comp_tc_data->output_size;
+	decomp_tc_data->output_size = 0;
+	decomp_tc_data->output_buffer = NULL;
 	
 	// Test decompression method
 	ret_chk = ioctl(fd, COMPIOC_DECOMPRESS, decomp_tc_data);
+	printf("ret_chk after decompression ioctl is %d\n", ret_chk);
+	printf("After decompression: \n");
+	printf("input size for decompression: %d\n", decomp_tc_data->input_size);
+	printf("output size after decompression: %d\n", decomp_tc_data->output_size);
 	TC_ASSERT_EQ_CLEANUP("decompress block", ret_chk, OK, uninitialize_tc_data());
+	
 	
 	//check the data before compression and after decompression
 	for (int i = 0; i < comp_tc_data->input_size; i++){

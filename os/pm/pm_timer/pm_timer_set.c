@@ -222,38 +222,7 @@ int pm_timer_set(int id, unsigned int timer_interval)
 }
 
 /************************************************************************
- * Name: pm_timer_stop
- *
- * Description:
- *   This function removes a timer from the linked list
- *
- * Parameters:
- *   id - id of the timer
- *
- * Return Value:
- *   0 - success
- *   -1 - error
- *
- ************************************************************************/
-
-int pm_timer_stop(int id) 
-{
-        /* Check for all status cases ??? */
-        pm_wakeup_timer_t *timer = get_pm_timer(id);
-        DEBUGASSERT(timer);
-
-        /* What if we want to stop the wakeup timer during it is 
-         * running. */
-        if (timer->status == RUNNING) {
-                /* TODO */
-        }
-
-        remove_pm_timer(timer);
-        return PM_TIMER_SUCCESS;
-}
-
-/************************************************************************
- * Name: pm_timer_delete
+ * Name: pm_timer_cancel
  *
  * Description:
  *   This function removes a wakeup timer from list if present and
@@ -268,7 +237,7 @@ int pm_timer_stop(int id)
  *
  ************************************************************************/
 
-int pm_timer_delete(int id) 
+int pm_timer_cancel(int id) 
 {
         /* Check for all status cases ??? */
         pm_wakeup_timer_t *timer = get_pm_timer(id);

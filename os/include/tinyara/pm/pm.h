@@ -247,12 +247,6 @@
 /* Defines default sleep duration */
 #define DEFAULT_PM_SLEEP_DURATION    10000000 /* 10 sec in microsecond*/
 
-#define PM_LOCK_PATH					"/proc/power/domains/0/pm_lock"
-#define PM_UNLOCK_PATH					"/proc/power/domains/0/pm_unlock"
-#ifdef CONFIG_PM_DVFS
-#define PM_TUNEFREQ_PATH				"/proc/power/domains/0/pm_tunefreq"
-#endif
-
 /****************************************************************************
  * Public Types
  ****************************************************************************/
@@ -335,6 +329,16 @@ struct pm_wakeup_timer_s {
 };
 
 typedef struct pm_wakeup_timer_s pm_wakeup_timer_t;
+
+/* this structure will be used by user app to send data to pm driver 
+ * during pm_timer_set() call. 
+ */
+
+struct pm_timer_header {
+    	uint16_t pid;
+	bool is_periodic;
+    	unsigned int timer_interval;
+};
 
 /* This structure contain pointers callback functions in the driver.  These
  * callback functions can be used to provide power management information
@@ -828,6 +832,8 @@ void pm_dvfs(int div_lvl);
  ****************************************************************************/
 void up_set_dvfs(int div_lvl);
 #endif
+
+void pm_driver_register(void);
 
 #undef EXTERN
 #ifdef __cplusplus

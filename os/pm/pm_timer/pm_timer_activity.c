@@ -111,7 +111,7 @@ int pm_set_wakeup_timer(void)
 	while (curr->expire_timetick < now && curr->next) {
 		prev = curr;
 		curr = curr->next;
-		pm_timer_stop(prev->id);
+		remove_pm_timer(get_pm_timer(prev->id));
 		pmdbg("removed timer with id %d from the list \n", prev->id);
 
 		/* system should not go to sleep now, should do pm lock until
@@ -141,7 +141,7 @@ int pm_set_wakeup_timer(void)
 	 * No need to start any timer, But do we need to wake up after a fixed timer? */
 	else {
 		pmdbg("every timer expire time is less than current time, last timer id is %d\n", curr->id);
-		pm_timer_stop(curr->id);
+		remove_pm_timer(get_pm_timer(curr->id));
 	}
 	
 	return PM_TIMER_SUCCESS;

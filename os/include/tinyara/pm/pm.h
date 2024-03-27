@@ -338,6 +338,16 @@ struct pm_wakeup_timer_s {
 
 typedef struct pm_wakeup_timer_s pm_wakeup_timer_t;
 
+/* this structure will be used by user app to send data to pm driver 
+ * during pm_timer_set() call. 
+ */
+
+struct pm_timer_header {
+    	uint16_t pid;
+	bool is_periodic;
+    	unsigned int timer_interval;
+};
+
 /* This structure contain pointers callback functions in the driver.  These
  * callback functions can be used to provide power management information
  * to the driver.

@@ -106,6 +106,38 @@ extern pm_wakeup_timer_t g_pmTimer_list[CONFIG_PM_MAX_WAKEUP_TIMER];
  * Public Function Prototypes
  ************************************************************************/
 
+/****************************************************************************
+ * Name: get_pm_timer
+ *
+ * Description:
+ *   Returns a pm timer pointer by checking the id
+ *
+ * Input Parameters:
+ *   id - id of the timer
+ *
+ * Returned Value:
+ *   pm_wakeup_timer_t *
+ *
+ ****************************************************************************/
+
+pm_wakeup_timer_t *get_pm_timer(int id);
+
+/****************************************************************************
+ * Name: remove_pm_timer
+ *
+ * Description:
+ *   Removes a pm timer from the g_pmTimer_activeList .
+ *
+ * Input Parameters:
+ *   a pointer to pm timer
+ *
+ * Returned Value:
+ *   None
+ *
+ ****************************************************************************/
+
+void remove_pm_timer(pm_wakeup_timer_t *timer);
+
 #undef EXTERN
 #ifdef __cplusplus
 }

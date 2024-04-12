@@ -84,59 +84,39 @@ extern "C" {
 #define EXTERN extern
 #endif
 
-/* The g_pm_activeList data structure is a singly linked list ordered by
+/* The g_pmTimer_freeList is a singly linked list of pm timers available
+ * to the system */
+
+extern sq_queue_t g_pmTimer_freeList;
+
+/* The g_pmTimer_activeList data structure is a singly linked list ordered by
  * pm wakeup timer expiration time.
  */
 
 extern sq_queue_t g_pmTimer_activeList;
 
 /* This is the number of free, pre-allocated pm wakeup timer structures in the
- * g_pmTimer_list. 
+ * g_pmTimer_freeList. 
  */
 
 extern uint16_t g_pmTimer_nfree;
 
-/* g_pmTimer_list is a list of pre-allocated pm timers. The number of pm timers
- * in the list is a configuration item.
- */
+/* This is a map from process ids to their respective pm lock status. 
+ * This will be used to lock the pm after pm timer expire and unlock again
+ * when the process completes it work 
+ * */
 
-extern pm_wakeup_timer_t g_pmTimer_list[CONFIG_PM_MAX_WAKEUP_TIMER];
+extern uint8_t is_pm_lock[CONFIG_MAX_TASKS];
+
+enum pm_pid_lock_status_e {
+    PM_PID_NONE = 0,        /* This means timer is not used */
+    PM_PID_LOCK,            /* This means pm transition is locked for the pid */
+    PM_PID_UNLOCK,          /* This means pm transition is relaxed for the pid */
+};
 
 /************************************************************************
  * Public Function Prototypes
  ************************************************************************/
-
-/****************************************************************************
- * Name: get_pm_timer
- *
- * Description:
- *   Returns a pm timer pointer by checking the id
- *
- * Input Parameters:
- *   id - id of the timer
- *
- * Returned Value:
- *   pm_wakeup_timer_t *
- *
- ****************************************************************************/
-
-pm_wakeup_timer_t *get_pm_timer(int id);
-
-/****************************************************************************
- * Name: remove_pm_timer
- *
- * Description:
- *   Removes a pm timer from the g_pmTimer_activeList .
- *
- * Input Parameters:
- *   a pointer to pm timer
- *
- * Returned Value:
- *   None
- *
- ****************************************************************************/
-
-void remove_pm_timer(pm_wakeup_timer_t *timer);
 
 #undef EXTERN
 #ifdef __cplusplus

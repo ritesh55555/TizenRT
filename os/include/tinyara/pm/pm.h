@@ -241,6 +241,15 @@
 											 */
 #endif
 
+/* PM timer Definitions *************************************************/
+/* Flag bits for the flags field of struct pm_wakeup_timer_s */
+
+#define PM_STATIC      (1 << 0)	        /* Bit 0: pm timer is statically allocated */
+#define PM_ALLOCED      (1 << 1)	/* Bit 1: pm timer is allocated at run time */
+
+#define PM_ISALLOCED(w)  (((w)->flags & PM_ALLOCED) != 0)
+#define PM_ISSTATIC(w)   (((w)->flags & PM_STATIC) != 0)
+
 /* Defines max length of device driver name for PM callback. */
 #define MAX_PM_CALLBACK_NAME    32
 
@@ -320,33 +329,14 @@ struct pm_timer_s {
 	uint32_t timer_interval;	             /* The interval for whichever timer is to be used */
 };
 
-enum pm_timer_status_e {
-	FREE = 0,         /* represents a timer is free and can be used by an app/user */
-	INACTIVE,         /* represents a timer is being used by user but not yet set or not in the g_pmTimer_activeList */
-	ACTIVE,           /* represents a timer is in the g_pmTimer_activeList and will be run before system goes to sleep */
-	RUNNING,          /* represents a timer has started with required delay */
-};
-
 struct pm_wakeup_timer_s {	
 	struct pm_wakeup_timer_s *next;   /* pointer to next timer in the linked list */
-	int id;                           /* id to get access to the timer */
-	unsigned int expire_timetick;     /* timetick to know when is the timer supposed to expire */
-	uint8_t status;                   /* can be FREE, INACTIVE, ACTIVE, RUNNING */
-	bool is_periodic;                 /* to check if its supposed to be periodic */
-	bool is_pm_lock;                  /* to check if pm lock is applied for this specific timer */
+	int pid;                          /* id of process that created pm timer */
+	uint8_t flags;                    /* See pm timer definations above*/
+	int delay;		          /* refers to time of sleep expected */
 };
 
 typedef struct pm_wakeup_timer_s pm_wakeup_timer_t;
-
-/* this structure will be used by user app to send data to pm driver 
- * during pm_timer_set() call. 
- */
-
-struct pm_timer_header {
-    	uint16_t pid;
-	bool is_periodic;
-    	unsigned int timer_interval;
-};
 
 /* This structure contain pointers callback functions in the driver.  These
  * callback functions can be used to provide power management information
@@ -587,9 +577,8 @@ void pm_set_timer(int timer_type, size_t timer_interval);
  *
  * Description:
  *   This function is called just before sleep to start the required PM wake up
- *   timer. It will remove the timers from the g_pmTimer_activeList that have 
- *   expire time lower than current time and start the timer with the expire time
- *   that is nearest in future to the current time.
+ *   timer. It will start the first timer from the g_pmTimer_activeList with the
+ *   required delay.(delay should be positive)
  * 
  * Input Parameters:
  *   None
@@ -601,26 +590,6 @@ void pm_set_timer(int timer_type, size_t timer_interval);
  ****************************************************************************/
 
 int pm_set_wakeup_timer(void);
-
-/****************************************************************************
- * Name: pm_timer_callback
- *
- * Description:
- *   This function is called after the wake up timer expires and system wakes up.
- *   This functon will remove the timer from the g_pmTimer_activeList becuase it just
- *   got expired. 
- *   If the timer was periodic, it will also lock the pm transition untill the app that
- *   had set the timer, execute its function.
- * 
- * Input Parameters:
- *   None
- *
- * Returned Value:
- *   None.
- *
- ****************************************************************************/
-
-void pm_timer_callback(void);
 
 /****************************************************************************
  * Name: pm_timer_initialize
@@ -645,29 +614,26 @@ void pm_timer_initialize(void);
  * Name: pm_timer_create
  *
  * Description:
- *   This function creates a pm timer structure for the user requested and
- *   initializes the timer fields and returns the id.
+ *   This function returns a free pm timer structure pointer.
  *
  * Parameters:
- *   is_periodic - if the timer should be periodic
+ *   None
  *
  * Return Value:
- *   id of the timer
+ *   pm timer
  *
  ************************************************************************/
 
-int pm_timer_create(bool is_periodic);
+pm_wakeup_timer_t *pm_timer_create();
 
 /************************************************************************
  * Name: pm_timer_set
  *
  * Description:
  *   This function adds a wakeup timer in the g_pmTimer_activeList. So that it will be
- *   invoked just before sleep when needed. It also removes the wakeup timer if
- *   its already present in the list.
- *
+ *   invoked just before sleep when needed. 
+ * 
  * Parameters:
- *   id - id of the timer
  *   timer_interval - expected board sleep duration
  *
  * Return Value:
@@ -676,17 +642,16 @@ int pm_timer_create(bool is_periodic);
  *
  ************************************************************************/
 
-int pm_timer_set(int id, unsigned int timer_interval);
+int pm_timer_set(unsigned int timer_interval);
 
 /************************************************************************
  * Name: pm_timer_cancel
  *
  * Description:
- *   This function removes a wakeup timer from list if present and
- *   also fress the timer for other apps to use.
+ *   This function will stop a working pm timer.
  *
  * Parameters:
- *   id - id of the timer
+ *   timer_interval - expected board sleep duration
  *
  * Return Value:
  *   0 - success
@@ -694,7 +659,25 @@ int pm_timer_set(int id, unsigned int timer_interval);
  *
  ************************************************************************/
 
-int pm_timer_cancel(int id);
+int pm_timer_cancel(void);
+
+/************************************************************************
+ * Name: pm_wakeup_handler
+ *
+ * Description:
+ *   This function is called just after board wakes up from sleep.
+ *   It updates the pm timer delay status in the g_pmTimer_activeList by
+ *   decreasing timer's delay to missing ticks.
+ *
+ * Parameters:
+ *   missing_tick : missing ticks after sleep
+ *
+ * Return Value:
+ *   None
+ *
+ ************************************************************************/
+
+void pm_wakeup_handler(clock_t missing_tick);
 
 /****************************************************************************
  * Name: pm_staycount

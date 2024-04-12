@@ -74,7 +74,7 @@ static ssize_t pm_write(FAR struct file *filep, FAR const char *buffer, size_t l
  *   PMIOC_RESUME - for unlocking a specific PM state
  *   PMIOC_TIMER_LOCK - for locking PM transition for certain time interval
  *   PMIOC_TIMER_SET - to set a wakeup timer
- *   PMIOC_TIMER_CANCEL - to delete a specific wakeup timer and make it available for other apps
+ *   PMIOC_TIMER_CANCEL - to stop a wakeup timer
  *   PMIOC_TUNEFREQ - for changing the operating frequency of the core to save power
  * 
  * Arguments:
@@ -116,31 +116,10 @@ static int pm_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 		}
 		break;
 	case PMIOC_TIMER_SET:
-		
-		if ((struct pm_timer_header *)arg == NULL) {
-			return -EINVAL;
-		}
-		
-		/* Check if the process is already using a pm timer, if no, create one */
-		if (pid_pmTimerMap[((struct pm_timer_header *)arg)->pid] == PM_NO_TIMER_USING) {
-			pid_pmTimerMap[((struct pm_timer_header *)arg)->pid] = pm_timer_create(((struct pm_timer_header *)arg)->is_periodic);
-		}
-		
-		/* Set the timer as required */
-		ret = pm_timer_set(pid_pmTimerMap[((struct pm_timer_header *)arg)->pid], ((struct pm_timer_header *)arg)->timer_interval);
-
-		/* If the timer is not periodic, we dont need to reuse it */
-		if (!((struct pm_timer_header *)arg)->is_periodic) {
-			pid_pmTimerMap[((struct pm_timer_header *)arg)->pid] = PM_NO_TIMER_USING;
-		}
+		ret = pm_timer_set((unsigned int)arg);
 		break;
 	case PMIOC_TIMER_CANCEL:
-		if (pid_pmTimerMap[(uint16_t)arg] == PM_NO_TIMER_USING) {
-			pmvdbg("Trying to cancel a pm timer that is not set\n");
-		} else {
-			ret = pm_timer_cancel(pid_pmTimerMap[(uint16_t)arg]);
-			pid_pmTimerMap[(uint16_t)arg] = PM_NO_TIMER_USING;
-		}
+		ret = pm_timer_cancel();
 		break;
 #ifdef CONFIG_PM_DVFS
         case PMIOC_TUNEFREQ:

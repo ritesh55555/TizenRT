@@ -68,14 +68,19 @@
  * Public Variables
  ************************************************************************/
 
-/* The g_pm_activeList data structure is a singly linked list ordered by
+/* The g_pmTimer_freeList is a singly linked list of pm timers available
+ * to the system */
+
+sq_queue_t g_pmTimer_freeList;
+
+/* The g_pmTimer_activeList data structure is a singly linked list ordered by
  * pm wakeup timer expiration time.
  */
 
 sq_queue_t g_pmTimer_activeList;
 
 /* This is the number of free, pre-allocated pm wakeup timer structures in the
- * g_pm_list. 
+ * g_pmTimer_freeList. 
  */
 
 uint16_t g_pmTimer_nfree;
@@ -84,7 +89,14 @@ uint16_t g_pmTimer_nfree;
  * in the list is a configuration item.
  */
 
-pm_wakeup_timer_t g_pmTimer_list[CONFIG_PM_MAX_WAKEUP_TIMER];
+pm_wakeup_timer_t g_pmTimer_pool[CONFIG_PM_MAX_WAKEUP_TIMER];
+
+/* This is a map from process ids to their respective pm lock status. 
+ * This will be used to lock the pm after pm timer expire and unlock again
+ * when the process completes it work 
+ * */
+
+uint8_t is_pm_lock[CONFIG_MAX_TASKS];
 
 /************************************************************************
  * Private Functions
@@ -94,41 +106,42 @@ pm_wakeup_timer_t g_pmTimer_list[CONFIG_PM_MAX_WAKEUP_TIMER];
  * Public Functions
  ************************************************************************/
 
-/************************************************************************
+/****************************************************************************
  * Name: pm_timer_initialize
  *
  * Description:
- * This function initializes the pm timer data structures
- *
- * Parameters:
+ *   This function will initialize a static array of pm wakeup timers that will be
+ *   used in the g_pmTimer_activeList. 
+ *  
+ *   This function should be called when OS starts.
+ * 
+ * Input Parameters:
  *   None
  *
- * Return Value:
- *   None
+ * Returned Value:
+ *   None.
  *
- * Assumptions:
- *   This function must be called early in the initialization sequence
- *   before the timer interrupt is attached and before any PM
- *   services are used.
- *
- ************************************************************************/
+ ****************************************************************************/
 
 void pm_timer_initialize(void)
 {
-        pm_wakeup_timer_t *timer = g_pmTimer_list;
+        pm_wakeup_timer_t *timer = g_pmTimer_pool;
+
+        for (int i = 0; i < CONFIG_MAX_TASKS; i++) {
+                is_pm_lock[i] = PM_PID_NONE;
+        }
 
         /* Initialize pm timer list */
 
+        sq_init(&g_pmTimer_freeList);
         sq_init(&g_pmTimer_activeList);
 
         /* The g_pmTimer_list must be initiated */
         for (int i = 0; i < CONFIG_PM_MAX_WAKEUP_TIMER; i++) {
-                timer->id = i;
-                timer->next = NULL;
-                timer->status = FREE;
-                timer++;
+                sq_addlast((pm_wakeup_timer_t *)timer++, &g_pmTimer_freeList);
         }
 
         /* All pm timers are free */
         g_pmTimer_nfree = CONFIG_PM_MAX_WAKEUP_TIMER;
+
 }

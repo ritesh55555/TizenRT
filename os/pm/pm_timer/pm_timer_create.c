@@ -80,42 +80,53 @@
  * Name: pm_timer_create
  *
  * Description:
- *   This function creates a pm timer structure for the user requested and
- *   initializes the timer fields and returns the id.
+ *   This function returns a free pm timer structure pointer.
  *
  * Parameters:
- *   is_periodic - if the timer should be periodic
+ *   None
  *
  * Return Value:
- *   id of the timer
+ *   pm timer
  *
  ************************************************************************/
 
-int pm_timer_create(bool is_periodic)
+pm_wakeup_timer_t *pm_timer_create()
 {
-        int id;
+        pm_wakeup_timer_t *timer;
         irqstate_t state;
 
-        if (g_pmTimer_nfree == 0) {
-                pmdbg("All the pm wakeup timers are busy!!!\n");
-                /* Need to implement dynamically allocated timers here ??? */
-                return PM_TIMER_FAIL;
-        }
-
-        /* get the first free pm timer from the list */
-        
+        /* Creating a timer should be atomic */
         state = enter_critical_section();
-        for (id = 0; id < CONFIG_PM_MAX_WAKEUP_TIMER; id++) {
-                if (g_pmTimer_list[id].status == FREE) {
-                        g_pmTimer_list[id].is_periodic = is_periodic;
-                        g_pmTimer_list[id].is_pm_lock = false;
-                        g_pmTimer_list[id].status = INACTIVE;
+
+        /* If we have pre-allocated timer available then use that */
+        if (g_pmTimer_nfree > 0) {
+                /* Remove the pm timer from the free list and decrement the 
+                 * count of free pm timers */
+                timer = (pm_wakeup_timer_t *)sq_remfirst(&g_pmTimer_freeList);
+
+                if (timer) {
                         DEBUGASSERT(g_pmTimer_nfree > 0);
                         g_pmTimer_nfree--;
-                        break;
+                        timer->next = NULL;
+                        timer->pid = getpid();
+                        timer->flags = PM_STATIC;
+                        pmdbg("pid of the timer is %d\n", timer->pid);
+                } else {
+                        /* if timer is NULL, g_pmTimer_nfree must be zero, else assert */
+                        DEBUGASSERT(g_pmTimer_nfree == 0);
+                }
+        } else {
+                timer = (pm_wakeup_timer_t *)kmm_malloc(sizeof(pm_wakeup_timer_t));
+
+                if (timer) {
+                        timer->next = NULL;
+                        timer->pid = getpid();
+                        timer->flags = PM_ALLOCED;
+                        pmdbg("pid of the timer is %d\n", timer->pid);
                 }
         }
+
         leave_critical_section(state);     
 
-        return id;
+        return timer;
 }

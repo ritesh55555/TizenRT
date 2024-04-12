@@ -73,39 +73,11 @@
  * Private Functions
  ************************************************************************/
 
-pm_wakeup_timer_t *get_pm_timer(int id)
-{
-        /* If we also use malloc to allocate memory for timers,
-         * We need a good way to return the required timer ??? 
-         * For now, we just return timer from the g_pmTimer_list. */
-
-        /* handle the case if it is a valid id */
-        if (id < 0 || id >= CONFIG_PM_MAX_WAKEUP_TIMER) {
-                pmdbg("Trying to access pm timer with invalid id, given id = %d\n", id);
-                return NULL;
-        }
-
-        /* We should not do any operation with FREE status timers unless created by app*/
-        if (g_pmTimer_list[id].status == FREE) {
-                return NULL;
-        }
-
-        return &g_pmTimer_list[id];
-}
-
-void remove_pm_timer(pm_wakeup_timer_t *timer)
-{
-        (void)sq_rem((FAR sq_entry_t *)timer, &g_pmTimer_activeList);
-        timer->status = INACTIVE;
-        pmdbg("pm timer with id %d is removed from list\n", timer->id);
-        /* check for extra operation or change any fields of the timer ??? */
-}
-
 void add_pm_timer(pm_wakeup_timer_t *timer, unsigned int timer_interval) 
 {
-        /* updating the expire time of the wakeup timer */
-        timer->expire_timetick = clock_systimer() + timer_interval;
-        pmdbg("timer->expire_timetick is %d\n", (int)timer->expire_timetick);
+        /* updating the delay of the wakeup timer */
+        timer->delay = timer_interval;
+        pmdbg("timer->delay is %d\n", timer->delay);
 
         /* Case where there are no timers in the list */
 
@@ -114,24 +86,33 @@ void add_pm_timer(pm_wakeup_timer_t *timer, unsigned int timer_interval)
                 pmdbg("timer added in the head of linked list\n");
         }
         
-        /* We should add the timer in the sorted position of expiration time */
+        /* We should add the timer in the sorted position of delay time */
 
          else {
                 pm_wakeup_timer_t *curr;
                 pm_wakeup_timer_t *prev;
                 prev = curr = (pm_wakeup_timer_t *)g_pmTimer_activeList.head;
+                unsigned int now = 0;
 
-                while (timer->expire_timetick >= curr->expire_timetick && curr->next) {
+                /* Advance to positive time */
+                while ((now += curr->delay) < 0 && curr->next) {
                         prev = curr;
                         curr = curr->next;
                 }
 
+                /* Advance past shorter delays */
+                while (now <= timer->delay && curr->next) {
+                        prev = curr;
+                        curr = curr->next;
+                        now += curr->delay;
+                }
+
                 /* timer should be added before the curr */
-                if (timer->expire_timetick < curr->expire_timetick) {
+                if (timer->delay < now) {
                         
+                        timer->delay -= (now - curr->delay);
+                        curr->delay -= timer->delay;
                         if (curr == (pm_wakeup_timer_t *)g_pmTimer_activeList.head) {
-                                /* if the first timer in the list was already running make it active */
-                                curr->status = ACTIVE;
                                 sq_addfirst((FAR sq_entry_t *)timer, &g_pmTimer_activeList);
                         } else {
                                 sq_addafter((FAR sq_entry_t *)prev, (FAR sq_entry_t *)timer, &g_pmTimer_activeList);
@@ -140,15 +121,15 @@ void add_pm_timer(pm_wakeup_timer_t *timer, unsigned int timer_interval)
                 /* timer expire time is greater than every other timer. 
                  * timer should be added to the end of the linked list*/
                 } else {
+                        timer->delay -= now;
                         if (!curr->next) {
                                 sq_addlast((FAR sq_entry_t *)timer, &g_pmTimer_activeList);
                         } else {
                                 sq_addafter((FAR sq_entry_t *)curr, (FAR sq_entry_t *)timer, &g_pmTimer_activeList);
                         }
                 }
-                pmdbg("timer with id %d added in linked list by using while loop\n", timer->id);
+                pmdbg("timer added in linked list by using while loop\n");
         }
-        timer->status = ACTIVE;
 }
 
 /************************************************************************
@@ -160,11 +141,9 @@ void add_pm_timer(pm_wakeup_timer_t *timer, unsigned int timer_interval)
  *
  * Description:
  *   This function adds a wakeup timer in the g_pmTimer_activeList. So that it will be
- *   invoked just before sleep when needed. It also removes the wakeup timer if
- *   its already present in the list.
- *
+ *   invoked just before sleep when needed. 
+ * 
  * Parameters:
- *   id - id of the timer
  *   timer_interval - expected board sleep duration
  *
  * Return Value:
@@ -173,101 +152,47 @@ void add_pm_timer(pm_wakeup_timer_t *timer, unsigned int timer_interval)
  *
  ************************************************************************/
 
-int pm_timer_set(int id, unsigned int timer_interval)
+int pm_timer_set(unsigned int timer_interval)
 {
-        pm_wakeup_timer_t *timer = get_pm_timer(id);
+        pm_wakeup_timer_t *timer = pm_timer_create();
         if (timer == NULL) {
-                pmdbg("Trying to access invalid id or access timer with wrong id\n");
+                pmdbg("Unable to create pm timer\n");
                 return PM_TIMER_FAIL;
         }
+
         irqstate_t state;
-
-        /* handle the case when timer is already running.
-         * This is not an expected case because app side should not
-         * set the same timer before the same timer gets expired. */
-        if (timer->status == RUNNING) {
-                pmdbg("timer is already RUNNING!!!\n");
-                /* TODO ??? */
-                return PM_TIMER_FAIL;
-        } 
-
-        /* Remove the timer from the list if it is already present.
-         * This is the case where system has not gone to sleep yet and
-         * already the given timer expired and user wants to set it again.
-         * possible scenarios:
-         * 1. system is in pm lock period
-         * 2. system takes too much time to sleep */
-        if (timer->status == ACTIVE) {
-                pmdbg("timer status is already ACTIVE!!!\n");
-                remove_pm_timer(timer);
-        }
 
         /* Now add the timer in the list 
          * Adding a wakeup timer in the linked list should be atomic.
          * Otherwise there is a chance of wrong ordering of the list.*/
         state = enter_critical_section();
-
-        /* Check if pm state is locked 
-         * if the timer is periodic, we might have locked the PM in the 
-         * last pm_timer_callback(), so we should unlock the PM. 
-         * These locks are specific to each wakeup timer.*/
-        if (timer->is_periodic) {
-                if (timer->is_pm_lock) {
-                        pm_relax(PM_IDLE_DOMAIN, PM_NORMAL);
-                        timer->is_pm_lock = false;
-                        pmdbg("pm timer with id %d is unlocked\n", timer->id);
-                }
-        }
-
         add_pm_timer(timer, timer_interval);
+
+        /* Unlock pm transition for the timer's process, as it might
+         * have been locked after last expiration */
+        if (is_pm_lock[timer->pid] == PM_PID_LOCK) {
+                pm_relax(PM_IDLE_DOMAIN, PM_NORMAL);
+                pmdbg("pm is unlocked for process with id = %d\n", timer->pid);
+        }
+        is_pm_lock[timer->pid] = PM_PID_UNLOCK;
         leave_critical_section(state);
         
         return PM_TIMER_SUCCESS;
 }
 
-/************************************************************************
- * Name: pm_timer_cancel
- *
- * Description:
- *   This function removes a wakeup timer from list if present and
- *   also fress the timer for other apps to use.
- *
- * Parameters:
- *   id - id of the timer
- *
- * Return Value:
- *   0 - success
- *   -1 - error
- *
- ************************************************************************/
-
-int pm_timer_cancel(int id) 
+int pm_timer_cancel(void) 
 {
-        /* Check for all status cases ??? */
-        pm_wakeup_timer_t *timer = get_pm_timer(id);
-        if (timer == NULL) {
-                pmdbg("Trying to access invalid id or access timer with wrong id\n");
+        int pid = getpid();
+
+        /* Check if trying to cancel without started */
+        if (is_pm_lock[pid] == PM_PID_NONE) {
+                pmdbg("process with pid %d is not using any pm timer\n", pid);
                 return PM_TIMER_FAIL;
-        }
-        irqstate_t state;
+        } 
 
-        /* What if we want to delete the wakeup timer during it is 
-         * running. */
-        if (timer->status == RUNNING) {
-                /* TODO */
-        }
-
-        /* Freeing a timer and increasing count of g_pmTimer_nfree should be atomic*/
-        state = enter_critical_section();
-        remove_pm_timer(timer);
-
-        /* Free the timer so that other app can use it.
-         * Also this might not be that simple if we add dynamically
-         * allocated timers. Need to check that ??? */
-        timer->status = FREE;
-        g_pmTimer_nfree++;
-        DEBUGASSERT(g_pmTimer_nfree <= CONFIG_PM_MAX_WAKEUP_TIMER);
-        leave_critical_section(state);
+        /* Map the pid's lock status to NONE , so that we know timer is not used*/
+        is_pm_lock[pid] = PM_PID_NONE;
 
         return PM_TIMER_SUCCESS;
 }
+

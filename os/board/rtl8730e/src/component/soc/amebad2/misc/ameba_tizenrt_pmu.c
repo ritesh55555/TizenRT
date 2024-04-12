@@ -313,6 +313,7 @@ void tizenrt_pre_sleep_processing(uint32_t *expected_idle_time)
 	if (tizenrt_sleep_handler) {
 		tizenrt_sleep_handler(ms_passed); /*  update kernel tick */
 	}
+	pm_wakeup_handler(ms_passed);
 #endif
 #endif
 

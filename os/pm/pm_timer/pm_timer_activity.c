@@ -56,6 +56,8 @@
 
 #include "pm_timer.h"
 
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
 /************************************************************************
  * Pre-processor Definitions
  ************************************************************************/
@@ -72,6 +74,54 @@
  * Private Functions
  ************************************************************************/
 
+void pm_timer_expire(void) 
+{
+	pm_wakeup_timer_t *head;
+	irqstate_t state;
+
+	while (g_pmTimer_activeList.head && ((pm_wakeup_timer_t *)g_pmTimer_activeList.head)->delay <= 0) {
+		
+    		head = (pm_wakeup_timer_t *)g_pmTimer_activeList.head;
+
+		/* Check if this needs to be atomic */
+		state = enter_critical_section();
+
+		/* Remove the pm timer from active list and lock the system 
+		 * for the specific pid, so that the specific thread can complete 
+		 * its function */
+		sq_remfirst(&g_pmTimer_activeList);
+		if (is_pm_lock[head->pid] == PM_PID_UNLOCK) {
+			is_pm_lock[head->pid] = PM_PID_LOCK;
+			pm_stay(PM_IDLE_DOMAIN, PM_NORMAL);
+			pmdbg("pm is locked for process with id = %d\n", head->pid);
+		}
+
+		if (PM_ISSTATIC(head)) {
+			/* Put the pm timer back on the free list */
+			sq_addlast((FAR sq_entry_t *)head, &g_pmTimer_freeList);
+			g_pmTimer_nfree++;
+			DEBUGASSERT(g_pmTimer_nfree <= CONFIG_PM_MAX_WAKEUP_TIMER);
+			leave_critical_section(state);
+
+		} else if (PM_ISALLOCED(head)) {
+			/* Free the dynamically allocated timer 
+			 * If the timer was released from an interrupt handler, 
+			 * sched_kfree() will defer the actual deallocation of the
+			 * memory until a more appropriate time. 
+			 * 
+			 * We don't need interrupts disabled to do this */
+			leave_critical_section(state);
+			sched_kfree(head);	
+
+		} else {
+			/* This should not be the case because a pm timer 
+			 * is either statically allocated or dynamically */
+			pmdbg("This should not be any case\n");
+			leave_critical_section(state);
+		}
+	}
+}
+
 /************************************************************************
  * Public Functions
  ************************************************************************/
@@ -80,10 +130,10 @@
  * Name: pm_set_wakeup_timer
  *
  * Description:
- *   This function decides which pm wakeup timer to be set just before sleep.
- *   It finds the wakeup timer with nearest future expiration time and sets it.
- *   When the board goes to sleep , it starts the timer and sleeps.
- *
+ *   This function is called just before sleep to start the required PM wake up
+ *   timer. It will start the first timer from the g_pmTimer_activeList with the
+ *   required delay.(delay should be positive)
+ * 
  * Input Parameters:
  *   None
  *
@@ -105,89 +155,90 @@ int pm_set_wakeup_timer(void)
     	pm_wakeup_timer_t *prev;
     	prev = curr = (pm_wakeup_timer_t *)g_pmTimer_activeList.head;
 
-	unsigned int now = clock_systimer();
-
-	/* Remove the wakeup timers that are already expired. */
-	while (curr->expire_timetick < now && curr->next) {
+	/* Remove the wakeup timers that are already expired. 
+	 * Although this must have already handled by pm_timer_update() */
+	while (curr->delay <= 0 && curr->next) {
 		prev = curr;
 		curr = curr->next;
-		remove_pm_timer(get_pm_timer(prev->id));
-		pmdbg("removed timer with id %d from the list \n", prev->id);
-
-		/* system should not go to sleep now, should do pm lock until
-		 * removed timer's work get done */
-		if (prev->is_periodic) {
-			pm_stay(PM_IDLE_DOMAIN, PM_NORMAL);
-			prev->is_pm_lock = true;
-			pmdbg("setting pm lock for timer with id %d\n", prev->id);
-			return PM_TIMER_FAIL;
-		}
-		/* if timer was not periodic, no need to lock*/ 
-		else {
-			prev->status = FREE;
-			g_pmTimer_nfree++;
-			DEBUGASSERT(g_pmTimer_nfree <= CONFIG_PM_MAX_WAKEUP_TIMER);
-		}
-		
 	}
 
-	if (curr->expire_timetick > now) {
-		pmdbg("setting timer with id %d\n", curr->id);
-		pmdbg("Board will wake up after %d millisecond\n", (curr->expire_timetick - now));
-		pm_set_timer(PM_WAKEUP_TIMER, (curr->expire_timetick - now) * 1000);
-		curr->status = RUNNING;
+	if (curr->delay > 0) {
+		pmdbg("Setting timer and Board will wake up after %d millisecond\n", curr->delay);
+		pm_set_timer(PM_WAKEUP_TIMER, curr->delay * 1000);
 	} 
-	/* Case where every timer expire time is less than current time. 
-	 * No need to start any timer, But do we need to wake up after a fixed timer? */
-	else {
-		pmdbg("every timer expire time is less than current time, last timer id is %d\n", curr->id);
-		remove_pm_timer(get_pm_timer(curr->id));
-	}
 	
 	return PM_TIMER_SUCCESS;
 }
 
 /****************************************************************************
- * Name: pm_timer_callback
+ * Name: pm_timer_update
  *
  * Description:
- *   This function runs after any of the wakeup timers expire . 
- *   It will be used to remove the latest running wakeup timer from the 
- *   g_pmTimer_activeList.
+ *   This function decreases the delay of head pm timer in the 
+ *   g_pmTimer_activeList by 1 after every sys tick. If the delay becomes 0,
+ *   It expires the pm timer.
  *
  * Input Parameters:
  *   None
  *
  * Returned Value:
  *   None.
+ * 
+ * Assumption: This should be also implemented for CONFIG_SCHED_TICKLESS and
+ * CONFIG_SCHED_TICKSUPRESS.
  *
  ****************************************************************************/
 
-void pm_timer_callback(void)
+void pm_timer_update(void)
 {
-	/* Check to see if the list is empty which should not be the case */
-	if (g_pmTimer_activeList.head == NULL) {
-		pmdbg("the linked list is empty!!!\n");
-		return;
-	}
-	pm_wakeup_timer_t *head;
-    	head = (pm_wakeup_timer_t *)g_pmTimer_activeList.head;
+	/* Check if there are any active pm timers to process */
+	if (g_pmTimer_activeList.head) {
 
-	/* Removing the first timer from the list because that is the one we started
-	 * before sleep. */
-	sq_remfirst(&g_pmTimer_activeList);
-	head->status = INACTIVE;
+		/* Decrement the delay of the head pm timer */
+		--(((pm_wakeup_timer_t *)g_pmTimer_activeList.head)->delay);
 
-	/* Making sure to lock pm until the app completes its timer related work */
-	if (head->is_periodic) {
-		pm_stay(PM_IDLE_DOMAIN, PM_NORMAL);
-		head->is_pm_lock = true;
-		pmdbg("setting pm lock for timer with id %d\n", head->id);
-	}
-	/* if timer was not periodic, no need to lock*/ 
-	else {
-		head->status = FREE;
-		g_pmTimer_nfree++;
-		DEBUGASSERT(g_pmTimer_nfree <= CONFIG_PM_MAX_WAKEUP_TIMER);
+		/* process the expired pm timers */
+		pm_timer_expire();
+
 	}
 }
+
+/************************************************************************
+ * Name: pm_wakeup_handler
+ *
+ * Description:
+ *   This function is called just after board wakes up from sleep.
+ *   It updates the pm timer delay status in the g_pmTimer_activeList by
+ *   decreasing timer's delay to missing ticks.
+ *
+ * Parameters:
+ *   missing_tick : missing ticks after sleep
+ *
+ * Return Value:
+ *   None
+ *
+ ************************************************************************/
+
+void pm_wakeup_handler(clock_t missing_tick)
+{
+	pm_wakeup_timer_t *timer;
+	int decr;
+	/* Check the boundary case, if missing tick is more than INTMAX*/
+	int ticks = missing_tick;
+
+	/* Check if there are any active pm timers to process */
+	while (g_pmTimer_activeList.head && ticks > 0) {
+
+		/* Get the pm timer at the head of the list */
+		timer = (pm_wakeup_timer_t *)g_pmTimer_activeList.head;
+
+		decr = MIN(timer->delay, ticks);
+		timer->delay -= decr;
+		ticks -= decr;
+		pmdbg("New timer delay is %d\n", timer->delay);
+
+		/* Check if the timer at the head of the list is ready to run */
+		pm_timer_expire();
+	}
+}
+

@@ -322,7 +322,7 @@ enum pm_timer_status_e {
 struct pm_wakeup_timer_s {	
 	struct pm_wakeup_timer_s *next;   /* pointer to next timer in the linked list */
 	int id;                           /* id to get access to the timer */
-	unsigned int expire_timetick;     /* timetick to know when is the timer supposed to expire */
+	unsigned int delay;               /* delay of the timer */
 	uint8_t status;                   /* can be FREE, INACTIVE, ACTIVE, RUNNING */
 	bool is_periodic;                 /* to check if its supposed to be periodic */
 	bool is_pm_lock;                  /* to check if pm lock is applied for this specific timer */

@@ -102,9 +102,9 @@ void remove_pm_timer(pm_wakeup_timer_t *timer)
 
 void add_pm_timer(pm_wakeup_timer_t *timer, unsigned int timer_interval) 
 {
-        /* updating the expire time of the wakeup timer */
-        timer->expire_timetick = clock_systimer() + timer_interval;
-        pmdbg("timer->expire_timetick is %d\n", (int)timer->expire_timetick);
+        /* updating the delay of the wakeup timer */
+        timer->delay = timer_interval;
+        pmdbg("timer->delay is %d\n", timer->delay);
 
         /* Case where there are no timers in the list */
 
@@ -113,21 +113,32 @@ void add_pm_timer(pm_wakeup_timer_t *timer, unsigned int timer_interval)
                 pmdbg("timer added in the head of linked list\n");
         }
         
-        /* We should add the timer in the sorted position of expiration time */
+        /* We should add the timer in the sorted position of delay time */
 
          else {
                 pm_wakeup_timer_t *curr;
                 pm_wakeup_timer_t *prev;
                 prev = curr = (pm_wakeup_timer_t *)g_pmTimer_activeList.head;
+                unsigned int now = 0;
 
-                while (timer->expire_timetick >= curr->expire_timetick && curr->next) {
+                /* Advance to positive time */
+                while ((now += curr->delay) < 0 && curr->next) {
                         prev = curr;
                         curr = curr->next;
                 }
 
+                /* Advance past shorter delays */
+                while (now <= timer->delay && curr->next) {
+                        prev = curr;
+                        curr = curr->next;
+                        now += curr->delay;
+                }
+
                 /* timer should be added before the curr */
-                if (timer->expire_timetick < curr->expire_timetick) {
+                if (timer->delay < now) {
                         
+                        timer->delay -= (now - curr->delay);
+                        curr->delay -= timer->delay;
                         if (curr == (pm_wakeup_timer_t *)g_pmTimer_activeList.head) {
                                 /* if the first timer in the list was already running make it active */
                                 curr->status = ACTIVE;
@@ -139,6 +150,7 @@ void add_pm_timer(pm_wakeup_timer_t *timer, unsigned int timer_interval)
                 /* timer expire time is greater than every other timer. 
                  * timer should be added to the end of the linked list*/
                 } else {
+                        timer->delay -= now;
                         if (!curr->next) {
                                 sq_addlast((FAR sq_entry_t *)timer, &g_pmTimer_activeList);
                         } else {

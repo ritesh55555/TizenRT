@@ -175,7 +175,7 @@ void pm_initialize(void)
 	/* The g_pmTimer_freeList must be initiated */
 	pm_wakeup_timer_t *timer = g_pmTimer_pool;
 	for (int i = 0; i < CONFIG_PM_MAX_WAKEUP_TIMER; i++) {
-			sq_addlast((pm_wakeup_timer_t *)timer++, &g_pmTimer_freeList);
+		sq_addlast((pm_wakeup_timer_t *)timer++, &g_pmTimer_freeList);
 	}
 
 	/* All pm timers are free */

@@ -74,7 +74,6 @@ static ssize_t pm_write(FAR struct file *filep, FAR const char *buffer, size_t l
  *   PMIOC_RESUME - for unlocking a specific PM state
  *   PMIOC_TIMER_LOCK - for locking PM transition for certain time interval
  *   PMIOC_TIMER_SET - to set a wakeup timer
- *   PMIOC_TIMER_CANCEL - to stop a wakeup timer
  *   PMIOC_TUNEFREQ - for changing the operating frequency of the core to save power
  * 
  * Arguments:
@@ -82,8 +81,9 @@ static ssize_t pm_write(FAR struct file *filep, FAR const char *buffer, size_t l
  *   the command. 
  *   for PMIOC_SUSPEND, arg is unsigned long representing PM STATE
  *   for PMIOC_RESUME, arg is unsigned long representing PM STATE
- *   for TIMER_SET, arg should be a pointer to struct pm_timer_header type.
- *   for TIMER_CANCEL, arg should be the pid of the process using the pm driver.
+ *   for TIMEDSTAY, arg should be a unsigned type (timer interval in micro second).
+ *   for TIMEDSTAY_CANCEL, arg not required
+ *   for TIMER_SET, arg should be an unsigned int.
  *   for TUNEFREQ, arg should be an int type.
  *
  * Description:
@@ -105,22 +105,18 @@ static int pm_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 		pm_relax(((pm_arg_t *)arg)->domain, ((pm_arg_t *)arg)->state);
 		pmvdbg("State unlocked!\n");
 		ret = OK;
-	case PMIOC_TIMER_LOCK:
+	case PMIOC_TIMEDSTAY:
 		if (arg > 0) {
-			pm_stay(PM_IDLE_DOMAIN, PM_NORMAL);
-			pmvdbg("State locked!\n");
-			pm_set_timer(PM_LOCK_TIMER, arg);
-			ret = OK;
+			ret = pm_timedStay((unsigned int)arg);
 		} else {
 			pmvdbg("Please input positive timer interval\n");
 		}
 		break;
-	case PMIOC_TIMER_SET:
-		ret = pm_timer_add((unsigned int)arg);
+	case PMIOC_TIMEDSTAY_CANCEL:
+		ret = pm_timedStay_cancel();
 		break;
-	case PMIOC_TIMER_CANCEL:
-		ret = OK;
-		// TODO
+	case PMIOC_TIMER_SET:
+		ret = pm_timer_add((int)arg);
 		break;
 #ifdef CONFIG_PM_DVFS
         case PMIOC_TUNEFREQ:

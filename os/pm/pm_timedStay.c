@@ -16,7 +16,7 @@
  *
  ****************************************************************************/
 /************************************************************************
- * pm/pm_timer/pm_timer_add.c
+ * pm/pm_timedStay.c
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -52,10 +52,9 @@
  ************************************************************************/
 
 #include <tinyara/pm/pm.h>
-#include <tinyara/clock.h>
-#include <tinyara/irq.h>
+#include <tinyara/wdog.h>
 
-#include "pm_timer.h"
+#include <pm_timer/pm_timer.h>
 
 /************************************************************************
  * Pre-processor Definitions
@@ -66,26 +65,39 @@
  ************************************************************************/
 
 /************************************************************************
- * Public Variables
+ * Private Variables
  ************************************************************************/
+
+/* This array maps the pid to their respective wdog timer. 
+ * Assumption: when a thread does a timed lock , only the same thread 
+ * can unlock the "timed lock" before it expire */
+static WDOG_ID pid_timerMap[CONFIG_MAX_TASKS];
 
 /************************************************************************
  * Private Functions
  ************************************************************************/
+
+static void timer_timeout(int argc, uint32_t pid)
+{
+	/* PM transition will be relaxed here */
+	if (pid_timerMap[pid] != NULL) {
+		pm_relax(PM_IDLE_DOMAIN, PM_NORMAL);
+		wd_delete(pid_timerMap[pid]);
+	}
+}
 
 /************************************************************************
  * Public Functions
  ************************************************************************/
 
 /************************************************************************
- * Name: pm_timer_add
+ * Name: pm_timedStay
  *
  * Description:
- *   This function adds a wakeup timer in the g_pmTimer_activeList. So that it will be
- *   invoked just before sleep when needed. 
+ *   This function locks PM transition for a specific duration.  
  * 
  * Parameters:
- *   timer_interval - expected board sleep duration
+ *   timer_interval - expected lock duration
  *
  * Return Value:
  *   0 - success
@@ -93,77 +105,67 @@
  *
  ************************************************************************/
 
-int pm_timer_add(int timer_interval)
+int pm_timedStay(unsigned int timer_interval)
 {
-        pm_wakeup_timer_t *timer = pm_timer_create();
-        if (timer == NULL) {
-                pmdbg("Unable to create pm timer\n");
-                return PM_TIMER_FAIL;
-        }
+	int pid = getpid();
 
-        irqstate_t state;
+	/* Check if there is already a wdog lock timer running for 
+	 * the process */
+	if (pid_timerMap[pid] != NULL) {
+		pmdbg("There is already a lock timer running for this process\n");
+		return PM_TIMER_FAIL;
+	}
+	
+	WDOG_ID wdog = wd_create();
+	pid_timerMap[pid] = wdog;
 
-        /* Now add the timer in the list 
-         * Adding a wakeup timer in the linked list should be atomic.
-         * Otherwise there is a chance of wrong ordering of the list.*/
-        state = enter_critical_section();
-        
-        /* updating the delay of the wakeup timer */
-        timer->delay = timer_interval;
+	/* Lock the pm transition and Start the wdog timer */
+	pm_stay(PM_IDLE_DOMAIN, PM_NORMAL);
+	int ret = wd_start(wdog, timer_interval, (wdentry_t)timer_timeout, 1, (uint32_t)pid);
+	pmvdbg("PM is locked for pid %d and timer started for %d milisecond\n", pid, timer_interval);
 
-        /* Case where there are no timers in the list */
+	if (ret != PM_TIMER_SUCCESS) {
+		return PM_TIMER_FAIL;
+	}
 
-        if (g_pmTimer_activeList.head == NULL) {
-                sq_addlast((FAR sq_entry_t *)timer, &g_pmTimer_activeList);
-        }
-        
-        /* We should add the timer in the sorted position of delay time */
-
-         else {
-                pm_wakeup_timer_t *curr;
-                pm_wakeup_timer_t *prev;
-                prev = curr = (pm_wakeup_timer_t *)g_pmTimer_activeList.head;
-                unsigned int now = 0;
-
-                /* Advance to positive time */
-                while ((now += curr->delay) < 0 && curr->next) {
-                        prev = curr;
-                        curr = curr->next;
-                }
-
-                /* Advance past shorter delays */
-                while (now <= timer->delay && curr->next) {
-                        prev = curr;
-                        curr = curr->next;
-                        now += curr->delay;
-                }
-
-                /* timer should be added before the curr */
-                if (timer->delay < now) {
-                        
-                        timer->delay -= (now - curr->delay);
-                        curr->delay -= timer->delay;
-                        if (curr == (pm_wakeup_timer_t *)g_pmTimer_activeList.head) {
-                                sq_addfirst((FAR sq_entry_t *)timer, &g_pmTimer_activeList);
-                        } else {
-                                sq_addafter((FAR sq_entry_t *)prev, (FAR sq_entry_t *)timer, &g_pmTimer_activeList);
-                        }  
-
-                /* timer expire time is greater than every other timer. 
-                 * timer should be added to the end of the linked list*/
-                } else {
-                        timer->delay -= now;
-                        if (!curr->next) {
-                                sq_addlast((FAR sq_entry_t *)timer, &g_pmTimer_activeList);
-                        } else {
-                                sq_addafter((FAR sq_entry_t *)curr, (FAR sq_entry_t *)timer, &g_pmTimer_activeList);
-                        }
-                }
-        }
-
-        leave_critical_section(state);
-        
-        return PM_TIMER_SUCCESS;
+	return ret;
 }
 
+/************************************************************************
+ * Name: pm_timedStay_cancel
+ *
+ * Description:
+ *   This function cancels the lock timer started by a specific process
+ * 
+ * Parameters:
+ *   None
+ *
+ * Return Value:
+ *   0 - success
+ *   -1 - error
+ *
+ ************************************************************************/
 
+int pm_timedStay_cancel()
+{
+	int pid = getpid();
+
+	/* Check if there is a wdog lock timer running for 
+	 * the process */
+	if (pid_timerMap[pid] == NULL) {
+		pmdbg("There is no lock timer running for this process\n");
+		return PM_TIMER_FAIL;
+	}
+
+	/* Now delete the wdog timer as we no longer need it */
+	pm_relax(PM_IDLE_DOMAIN, PM_NORMAL);
+	WDOG_ID wdog = pid_timerMap[pid];
+	pid_timerMap[pid] = NULL;
+	int ret = wd_delete(wdog);
+
+	if (ret != PM_TIMER_SUCCESS) {
+		return PM_TIMER_FAIL;
+	}
+
+	return ret;
+}

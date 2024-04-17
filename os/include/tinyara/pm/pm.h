@@ -628,7 +628,41 @@ void pm_timer_update(int ticks);
  *
  ************************************************************************/
 
-int pm_timer_add(unsigned int timer_interval);
+int pm_timer_add(int timer_interval);
+
+/************************************************************************
+ * Name: pm_timedStay
+ *
+ * Description:
+ *   This function locks PM transition for a specific duration.  
+ * 
+ * Parameters:
+ *   timer_interval - expected lock duration
+ *
+ * Return Value:
+ *   0 - success
+ *   -1 - error
+ *
+ ************************************************************************/
+
+int pm_timedStay(unsigned int timer_interval);
+
+/************************************************************************
+ * Name: pm_timedStay_cancel
+ *
+ * Description:
+ *   This function cancels the lock timer started by a specific process
+ * 
+ * Parameters:
+ *   None
+ *
+ * Return Value:
+ *   0 - success
+ *   -1 - error
+ *
+ ************************************************************************/
+
+int pm_timedStay_cancel();
 
 /****************************************************************************
  * Name: pm_staycount

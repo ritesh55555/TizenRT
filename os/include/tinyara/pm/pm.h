@@ -592,42 +592,28 @@ void pm_set_timer(int timer_type, size_t timer_interval);
 int pm_set_wakeup_timer(void);
 
 /****************************************************************************
- * Name: pm_timer_initialize
+ * Name: pm_timer_update
  *
  * Description:
- *   This function will initialize a static array of pm wakeup timers that will be
- *   used in the g_pmTimer_activeList. 
- *  
- *   This function should be called when OS starts.
- * 
+ *   This function decreases the delay of head pm timer in the 
+ *   g_pmTimer_activeList by given ticks. If the delay becomes 0,
+ *   It expires the pm timer.
+ *
  * Input Parameters:
- *   None
+ *   Ticks to decrease
  *
  * Returned Value:
  *   None.
+ * 
+ * Assumption: This should be also implemented for CONFIG_SCHED_TICKLESS and
+ * CONFIG_SCHED_TICKSUPRESS.
  *
  ****************************************************************************/
 
-void pm_timer_initialize(void);
+void pm_timer_update(int ticks);
 
 /************************************************************************
- * Name: pm_timer_create
- *
- * Description:
- *   This function returns a free pm timer structure pointer.
- *
- * Parameters:
- *   None
- *
- * Return Value:
- *   pm timer
- *
- ************************************************************************/
-
-pm_wakeup_timer_t *pm_timer_create();
-
-/************************************************************************
- * Name: pm_timer_set
+ * Name: pm_timer_add
  *
  * Description:
  *   This function adds a wakeup timer in the g_pmTimer_activeList. So that it will be
@@ -642,42 +628,7 @@ pm_wakeup_timer_t *pm_timer_create();
  *
  ************************************************************************/
 
-int pm_timer_set(unsigned int timer_interval);
-
-/************************************************************************
- * Name: pm_timer_cancel
- *
- * Description:
- *   This function will stop a working pm timer.
- *
- * Parameters:
- *   timer_interval - expected board sleep duration
- *
- * Return Value:
- *   0 - success
- *   -1 - error
- *
- ************************************************************************/
-
-int pm_timer_cancel(void);
-
-/************************************************************************
- * Name: pm_wakeup_handler
- *
- * Description:
- *   This function is called just after board wakes up from sleep.
- *   It updates the pm timer delay status in the g_pmTimer_activeList by
- *   decreasing timer's delay to missing ticks.
- *
- * Parameters:
- *   missing_tick : missing ticks after sleep
- *
- * Return Value:
- *   None
- *
- ************************************************************************/
-
-void pm_wakeup_handler(clock_t missing_tick);
+int pm_timer_add(unsigned int timer_interval);
 
 /****************************************************************************
  * Name: pm_staycount

@@ -16,7 +16,7 @@
  *
  ****************************************************************************/
 /************************************************************************
- * pm/pm_timer/pm_timer_create.c
+ * pm/pm_timer/pm_timer_add.c
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -73,17 +73,48 @@
  * Private Functions
  ************************************************************************/
 
-void add_pm_timer(pm_wakeup_timer_t *timer, unsigned int timer_interval) 
+/************************************************************************
+ * Public Functions
+ ************************************************************************/
+
+/************************************************************************
+ * Name: pm_timer_add
+ *
+ * Description:
+ *   This function adds a wakeup timer in the g_pmTimer_activeList. So that it will be
+ *   invoked just before sleep when needed. 
+ * 
+ * Parameters:
+ *   timer_interval - expected board sleep duration
+ *
+ * Return Value:
+ *   0 - success
+ *   -1 - error
+ *
+ ************************************************************************/
+
+int pm_timer_add(unsigned int timer_interval)
 {
+        pm_wakeup_timer_t *timer = pm_timer_create();
+        if (timer == NULL) {
+                pmdbg("Unable to create pm timer\n");
+                return PM_TIMER_FAIL;
+        }
+
+        irqstate_t state;
+
+        /* Now add the timer in the list 
+         * Adding a wakeup timer in the linked list should be atomic.
+         * Otherwise there is a chance of wrong ordering of the list.*/
+        state = enter_critical_section();
+        
         /* updating the delay of the wakeup timer */
         timer->delay = timer_interval;
-        pmdbg("timer->delay is %d\n", timer->delay);
 
         /* Case where there are no timers in the list */
 
         if (g_pmTimer_activeList.head == NULL) {
                 sq_addlast((FAR sq_entry_t *)timer, &g_pmTimer_activeList);
-                pmdbg("timer added in the head of linked list\n");
         }
         
         /* We should add the timer in the sorted position of delay time */
@@ -128,71 +159,11 @@ void add_pm_timer(pm_wakeup_timer_t *timer, unsigned int timer_interval)
                                 sq_addafter((FAR sq_entry_t *)curr, (FAR sq_entry_t *)timer, &g_pmTimer_activeList);
                         }
                 }
-                pmdbg("timer added in linked list by using while loop\n");
-        }
-}
-
-/************************************************************************
- * Public Functions
- ************************************************************************/
-
-/************************************************************************
- * Name: pm_timer_set
- *
- * Description:
- *   This function adds a wakeup timer in the g_pmTimer_activeList. So that it will be
- *   invoked just before sleep when needed. 
- * 
- * Parameters:
- *   timer_interval - expected board sleep duration
- *
- * Return Value:
- *   0 - success
- *   -1 - error
- *
- ************************************************************************/
-
-int pm_timer_set(unsigned int timer_interval)
-{
-        pm_wakeup_timer_t *timer = pm_timer_create();
-        if (timer == NULL) {
-                pmdbg("Unable to create pm timer\n");
-                return PM_TIMER_FAIL;
         }
 
-        irqstate_t state;
-
-        /* Now add the timer in the list 
-         * Adding a wakeup timer in the linked list should be atomic.
-         * Otherwise there is a chance of wrong ordering of the list.*/
-        state = enter_critical_section();
-        add_pm_timer(timer, timer_interval);
-
-        /* Unlock pm transition for the timer's process, as it might
-         * have been locked after last expiration */
-        if (is_pm_lock[timer->pid] == PM_PID_LOCK) {
-                pm_relax(PM_IDLE_DOMAIN, PM_NORMAL);
-                pmdbg("pm is unlocked for process with id = %d\n", timer->pid);
-        }
-        is_pm_lock[timer->pid] = PM_PID_UNLOCK;
         leave_critical_section(state);
         
         return PM_TIMER_SUCCESS;
 }
 
-int pm_timer_cancel(void) 
-{
-        int pid = getpid();
-
-        /* Check if trying to cancel without started */
-        if (is_pm_lock[pid] == PM_PID_NONE) {
-                pmdbg("process with pid %d is not using any pm timer\n", pid);
-                return PM_TIMER_FAIL;
-        } 
-
-        /* Map the pid's lock status to NONE , so that we know timer is not used*/
-        is_pm_lock[pid] = PM_PID_NONE;
-
-        return PM_TIMER_SUCCESS;
-}
 

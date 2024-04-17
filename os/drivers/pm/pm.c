@@ -116,10 +116,11 @@ static int pm_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 		}
 		break;
 	case PMIOC_TIMER_SET:
-		ret = pm_timer_set((unsigned int)arg);
+		ret = pm_timer_add((unsigned int)arg);
 		break;
 	case PMIOC_TIMER_CANCEL:
-		ret = pm_timer_cancel();
+		ret = OK;
+		// TODO
 		break;
 #ifdef CONFIG_PM_DVFS
         case PMIOC_TUNEFREQ:

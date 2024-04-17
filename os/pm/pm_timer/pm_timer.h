@@ -101,22 +101,43 @@ extern sq_queue_t g_pmTimer_activeList;
 
 extern uint16_t g_pmTimer_nfree;
 
-/* This is a map from process ids to their respective pm lock status. 
- * This will be used to lock the pm after pm timer expire and unlock again
- * when the process completes it work 
- * */
-
-extern uint8_t is_pm_lock[CONFIG_MAX_TASKS];
-
-enum pm_pid_lock_status_e {
-    PM_PID_NONE = 0,        /* This means timer is not used */
-    PM_PID_LOCK,            /* This means pm transition is locked for the pid */
-    PM_PID_UNLOCK,          /* This means pm transition is relaxed for the pid */
-};
-
 /************************************************************************
  * Public Function Prototypes
  ************************************************************************/
+
+/************************************************************************
+ * Name: pm_timer_create
+ *
+ * Description:
+ *   This function creates a pm timer structure for the user requested and
+ *   initializes the timer fields and returns the id.
+ *
+ * Parameters:
+ *   is_periodic - if the timer should be periodic
+ *
+ * Return Value:
+ *   id of the timer
+ *
+ ************************************************************************/
+
+pm_wakeup_timer_t *pm_timer_create();
+
+/************************************************************************
+ * Name: pm_timer_delete
+ *
+ * Description:
+ *   This function deletes a pm timer. It either returns it to the 
+ *   g_pmTimer_freeList or frees it if it was created dynamically.
+ *
+ * Parameters:
+ *   pm timer to be deleted
+ *
+ * Return Value:
+ *   None
+ *
+ ************************************************************************/
+
+void pm_timer_delete(pm_wakeup_timer_t *timer) ;
 
 #undef EXTERN
 #ifdef __cplusplus

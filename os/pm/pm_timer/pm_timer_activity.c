@@ -52,8 +52,6 @@
  ************************************************************************/
 
 #include <tinyara/pm/pm.h>
-#include <tinyara/irq.h>
-
 #include "pm_timer.h"
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -77,48 +75,16 @@
 void pm_timer_expire(void) 
 {
 	pm_wakeup_timer_t *head;
-	irqstate_t state;
 
 	while (g_pmTimer_activeList.head && ((pm_wakeup_timer_t *)g_pmTimer_activeList.head)->delay <= 0) {
 		
     		head = (pm_wakeup_timer_t *)g_pmTimer_activeList.head;
 
-		/* Check if this needs to be atomic */
-		state = enter_critical_section();
+		/* Remove the pm timer from active list */
+        	sq_remfirst(&g_pmTimer_activeList);
 
-		/* Remove the pm timer from active list and lock the system 
-		 * for the specific pid, so that the specific thread can complete 
-		 * its function */
-		sq_remfirst(&g_pmTimer_activeList);
-		if (is_pm_lock[head->pid] == PM_PID_UNLOCK) {
-			is_pm_lock[head->pid] = PM_PID_LOCK;
-			pm_stay(PM_IDLE_DOMAIN, PM_NORMAL);
-			pmdbg("pm is locked for process with id = %d\n", head->pid);
-		}
-
-		if (PM_ISSTATIC(head)) {
-			/* Put the pm timer back on the free list */
-			sq_addlast((FAR sq_entry_t *)head, &g_pmTimer_freeList);
-			g_pmTimer_nfree++;
-			DEBUGASSERT(g_pmTimer_nfree <= CONFIG_PM_MAX_WAKEUP_TIMER);
-			leave_critical_section(state);
-
-		} else if (PM_ISALLOCED(head)) {
-			/* Free the dynamically allocated timer 
-			 * If the timer was released from an interrupt handler, 
-			 * sched_kfree() will defer the actual deallocation of the
-			 * memory until a more appropriate time. 
-			 * 
-			 * We don't need interrupts disabled to do this */
-			leave_critical_section(state);
-			sched_kfree(head);	
-
-		} else {
-			/* This should not be the case because a pm timer 
-			 * is either statically allocated or dynamically */
-			pmdbg("This should not be any case\n");
-			leave_critical_section(state);
-		}
+		/* Make the pm timer free */
+		pm_timer_delete(head);
 	}
 }
 
@@ -175,11 +141,11 @@ int pm_set_wakeup_timer(void)
  *
  * Description:
  *   This function decreases the delay of head pm timer in the 
- *   g_pmTimer_activeList by 1 after every sys tick. If the delay becomes 0,
+ *   g_pmTimer_activeList by given ticks. If the delay becomes 0,
  *   It expires the pm timer.
  *
  * Input Parameters:
- *   None
+ *   Ticks to decrease
  *
  * Returned Value:
  *   None.
@@ -189,42 +155,10 @@ int pm_set_wakeup_timer(void)
  *
  ****************************************************************************/
 
-void pm_timer_update(void)
-{
-	/* Check if there are any active pm timers to process */
-	if (g_pmTimer_activeList.head) {
-
-		/* Decrement the delay of the head pm timer */
-		--(((pm_wakeup_timer_t *)g_pmTimer_activeList.head)->delay);
-
-		/* process the expired pm timers */
-		pm_timer_expire();
-
-	}
-}
-
-/************************************************************************
- * Name: pm_wakeup_handler
- *
- * Description:
- *   This function is called just after board wakes up from sleep.
- *   It updates the pm timer delay status in the g_pmTimer_activeList by
- *   decreasing timer's delay to missing ticks.
- *
- * Parameters:
- *   missing_tick : missing ticks after sleep
- *
- * Return Value:
- *   None
- *
- ************************************************************************/
-
-void pm_wakeup_handler(clock_t missing_tick)
+void pm_timer_update(int ticks)
 {
 	pm_wakeup_timer_t *timer;
 	int decr;
-	/* Check the boundary case, if missing tick is more than INTMAX*/
-	int ticks = missing_tick;
 
 	/* Check if there are any active pm timers to process */
 	while (g_pmTimer_activeList.head && ticks > 0) {
@@ -235,7 +169,6 @@ void pm_wakeup_handler(clock_t missing_tick)
 		decr = MIN(timer->delay, ticks);
 		timer->delay -= decr;
 		ticks -= decr;
-		pmdbg("New timer delay is %d\n", timer->delay);
 
 		/* Check if the timer at the head of the list is ready to run */
 		pm_timer_expire();

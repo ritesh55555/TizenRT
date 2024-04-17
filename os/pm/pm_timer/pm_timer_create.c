@@ -110,7 +110,7 @@ pm_wakeup_timer_t *pm_timer_create()
                         timer->next = NULL;
                         timer->pid = getpid();
                         timer->flags = PM_STATIC;
-                        pmdbg("pid of the timer is %d\n", timer->pid);
+                        pmvdbg("pid of the timer is %d\n", timer->pid);
                 } else {
                         /* if timer is NULL, g_pmTimer_nfree must be zero, else assert */
                         DEBUGASSERT(g_pmTimer_nfree == 0);
@@ -122,7 +122,7 @@ pm_wakeup_timer_t *pm_timer_create()
                         timer->next = NULL;
                         timer->pid = getpid();
                         timer->flags = PM_ALLOCED;
-                        pmdbg("pid of the timer is %d\n", timer->pid);
+                        pmvdbg("pid of the timer is %d\n", timer->pid);
                 }
         }
 

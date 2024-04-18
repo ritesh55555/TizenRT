@@ -1,3 +1,0 @@
-config ENTRY_AMEBA_MIPI
-	bool "AMEBA_MIPI example"
-	depends on EXAMPLES_AMEBA_MIPI

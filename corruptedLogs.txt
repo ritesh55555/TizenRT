@@ -1,0 +1,445 @@
+09:00:24.74| [main_task] I SET_APP subdevice_vs.c:102 init_subdevice_vs_resource() init subdevice_vs resource
+|09:00:24.75| [main_task] I SET_APP subdevices_vs.c:118 init_subdevices_vs_resource() init subdevices_vs resource
+|09:00:24.76| [main_task] I SET_APP temperature_control_vs.c:113 init_temperature_control_vs_resource() init temperature control resource
+|09:00:24.77| [main_task] I SET_APP temperature_current.c:143 init_temperature_current_resource() init temperature current resource
+|09:00:24.78| [main_task] I SET_APP temperature_desired.c:154 init_temperature_desired_resource() init temperature desired resource
+|09:00:24.79| [main_task] I SET_APP temperatures_vs.c:215 init_temperatures_vs_resource() init temperatures_vs resource
+|09:00:24.81| [main_task] I SET_APP uvled_vs.c:152 init_uvled_vs_resource() init uvled_vs resource
+|09:00:24.81| [main_task] I SET_APP ventilation_setting_vs.c:141 init_ventilation_setting_vs_resource() init ventilation_setting_vs resource
+|09:00:24.83| [main_task] I SET_APP wind_direction_vs.c:163 init_wind_direction_vs_resource() init wind_direction_vs resource
+|09:00:24.84| [main_task] I SET_APP wind_strength_vs.c:182 init_wind_strength_vs_resource() init wind_strength_vs resource
+|09:00:24.85| [main_task] I OCF easysetup_manager.c:540 easysetup_manager_init() IN
+|09:00:24.86| [main_task] I PRODUCT_SCUBE device_info.c:235 set_default_vid() set default vid[0] DA-AC-FAC-0200X,
+|09:00:24.87| [main_task] I PRODUCT_SCUBE device_info.c:235 set_default_vid() set default vid[1] DA-AC-RAC-02001-SUB,
+|09:00:24.88| [main_task] E PRODUCT_SCUBE device_info.c:254 get_vid() OUT OF ASCII, get default vid[0] DA-AC-FAC-0200X,
+|09:00:24.89| [main_task] W SET_APP serial_manager.c:188 internal_serial_manager_get_serial_number_by_device_number() serial number is (********F00B)
+|09:00:24.91| [main_task] I SET_APP fill_ocf.c:171 device_profile_getter() device_profile_getter(0) is started
+|09:00:24.92| [main_task] I SET_APP fill_ocf.c:197 device_profile_getter() device_profile_getter(0) is ended
+|09:00:24.93| [main_task] I OCF serial_manager.c:294 serial_manager_verify_serial_number() serial_number is verified. (********F00B)
+|09:00:24.94| [main_task] I OCF provisioning_info.c:907 init_provisioning_info_resource() Serial & Hashed Serial confirm support
+|09:00:24.95| [main_task] I OCF provisioning_info.c:912 init_provisioning_info_resource() QR confirm support
+|09:00:24.96| [main_task] I OCF provisioning_info.c:921 init_provisioning_info_resource() preceding confirm bit on
+|09:00:24.97| [main_task] I OCF provisioning_info.c:924 init_provisioning_info_resource() ble ranging based confirm bit on
+|09:00:24.98| [main_task] I OCF ble_controller.c:415 ble_controller_adv_set_confirm_method() Set BLE ADV data. otm_feature: 89096(0x15c08)
+|09:00:25.00| [main_task] I OCF ble_controller.c:428 ble_controller_adv_set_confirm_method() Set BLE ADV data. confirm_method: 2056(0x808)
+0201041BFF7500420C83  45  5D30414A544146300000013132333435360A0204      0BFF750046303042040208080A09466C6F6F7220412F430000000000000000
+|09:00:25.02| [main_task] I OCF ble_controller.c:346 ble_controller_adv_set_owned() owned: 0
+|09:00:25.03| [main_task] I OCF ble_controller.c:372 ble_controller_adv_set_calm_support() calm_support: 0
+|09:00:25.04| [main_task] I OCF ble_controller.c:366 ble_controller_adv_set_2fa_support() 2fa_support: 0
+|09:00:25.05| [main_task] I OCF ble_controller.c:378 ble_controller_adv_set_foa_status() foa_status: 0
+|09:00:25.06| [main_task] I OCF ble_controller.c:396 ble_controller_adv_set_setup_available() setup_available: 4
+|09:00:25.07| [main_task] I OCF ble_controller.c:355 ble_controller_adv_set_onboarding_available() onboarding_available: 1
+|09:00:25.08| [main_task] I OCF ble_controller.c:402 ble_controller_adv_set_ble_mac() ble_mac: 88:57:1d:f1:d5:6d
+0201041BFF7500420C83  05  5D30414A5441463000040188571DF1D56D0A0204      0BFF750046303042040208080A09466C6F6F7220412F430000000000000000
+|09:00:25.16| [main_task] I SYSTEM_API netlib_utils.c:369 netlib_dns_activate_task_filter() netlib_dns_activate_task_filter() is called
+|09:00:25.17| [main_task] I SET_APP set_app_main.c:236 set_app_main_init_ocf() Initialize ocf_manager done.
+|09:00:25.18| [main_task] I DRLC drlc_mgmt.c:68 init_drlc() Initialize DRLC done
+f_ext over
+file open fail mode[r] errno [2]
+f_ext over
+file open fail mode[r] errno [2]
+|09:00:25.20| [main_task] I PRODUCT_REALTIME_NOTI realtimenotiforclient_mgmt.c:215 init_realtimenotiforclient() Initialize init_realtimenotiforclient done
+|09:00:25.21| [main_task] I SET_APP ai_sleep.c:89 ai_sleep_load() file read success
+|09:00:25.23| [main_task] I SET_APP ai_sleep.c:110 ai_sleep_save() file wrtie success
+|09:00:25.23| [main_task] I SET_APP ai_sleep.c:61 ai_sleep_init() Initialize ai_sleep done
+f_ext over
+file open fail mode[r] errno [2]
+|09:00:25.24| [main_task] E AICLIENT ai_client.c:56 ai_server_setting_fileload() file open failed
+|09:00:25.25| [main_task] I SET_APP ai_client.c:154 init_ai_client() Initialize ai_client done
+f_ext over
+file open fail mode[r] errno [2]
+f_ext over
+file open fail mode[r] errno [2]
+|09:00:25.27| [main_task] I RESERVATION schedule_mgmt.c:848 schedule_init_module() Initialize schedule done
+f_ext over
+file open fail mode[r] errno [2]
+|09:00:25.28| [main_task] E WEATHER weather_mgmt.c:287 weather_mgmt_init() _weahter_read_region_nation_from_file() Failed
+|09:00:25.30| [main_task] E WEATHER weather_mgmt.c:292 weather_mgmt_init() Initialize weather done
+|09:00:25.30| [main_task] E ENERGY energyconsumption_mgmt.c:98 energyconsumption_init() Initialize energy consumption done
+|09:00:25.32| [main_task] I SCUBE micom_status_define.c:512 isSupportSensordatasink() Micom Support Sensordatasink
+f_ext over
+file open fail mode[r] errno [2]
+f_ext over
+file open fail mode[r] errno [2]
+|09:00:25.34| [main_task] I SET_APP sensordatasinks_mgmt.c:78 init_sensor_data_sinks_mgmt() Initialize sensor_data_sinks Task done.
+|09:00:25.35| [main_task] I RM hrm_event_update_handler.c:41 hrm_event_update_handler_initialize() Success to initialize HRM event update  handler
+|09:00:25.36| [main_task] I SCUBE scube_non_tlv.c:135 scube_non_tlv_set_cluster() NON-TLV cluster [FE20]
+|09:00:25.37| [main_task] I SET_APP dacm_rm_main.c:31 dacm_rm_main_init() Success to initialize HRM
+|09:00:25.38| [main_task] I RM main_rm.c:57 main_hrm_init() Initialize main HRM done.
+[SSM library version: 1.0.0]
+|09:00:25.39| [main_task] I SSM SSM_client.c:1636 set_authorization_key() Current board has AES private key in SE : True
+[LOGBUF] log_buffer_init 1607472000 
+|09:00:25.41| [main_task] I SSM SSM_client_SYS.c:154 SSM_SYS_register_callback() SSM Register callback (system_callback)
+SEND_PACKET : D0 C0 02 0E 00 00 00 00 00 1E FC 94 02 02 97 00 FD E0
+|09:00:25.42| [main_task] I SSM SSM_client_SYS.c:154 SSM_SYS_register_callback() SSM Register callback (wifi_callback)
+Add KPI number (tag 0, name reboot_reason, value 55, type 1)
+KPI new index reboot_reason : 0 
+|09:00:25.45| [main_task] I SSM SSM_external_module.c:49 Send_reboot_reason() Reboot reason : 55
+Add log time : 1713398425, code : SS05, level : 5, message : (null)
+[LOGBUF] SSM : SS05, (null)
+RECV_PACKET : D0 C0 02 0F 00 00 00 00 00 1E FC 94 03 03 97 01 F0 0D E0
+|09:00:25.47| [<pthread>] I SSM SSM_client.c:443 SSM_client_task_func() Create SSM_client_task_func 
+|09:00:25.48| [main_task] I SSM SSM_client.c:330 SSM_init() SSM init done
+|09:00:25.49| [main_task] I SET_APP main_ssm.c:99 main_ssm_init() Initialize main SSM done.
+|09:00:25.50| [main_task] I SET_APP main_log.c:26 print_set_app_main_done() AS01 Initialize Set app main success
+Add log time : 1713398425, code : AS01, level : 5, message : 
+[LOGBUF] SSM : AS01, 
+|09:00:25.52| [main_task] I SET_APP main_log.c:28 print_set_app_main_done()  ++++++++++++++++++++++++ 
+|09:00:25.53| [main_task] I SET_APP main_log.c:29 print_set_app_main_done()  START SET Main Task Done 
+|09:00:25.54| [main_task] I SET_APP main_log.c:30 print_set_app_main_done()  ++++++++++++++++++++++++ 
+[BLEMGR] already running
+|09:00:25.55| [main_task] I (null) btrmc_mgmt.c:1266 btrmc_ble_tizenrt_scatternet_gap_app_callback: [APP] ADV started: adv_type 0  
+init() Bonded Dev Num : 0
+
+|09:00:25.57| [main_task] E (null) btrmc_mgmt.c:1279 btrmc_init() There is no bonded data.
+|09:00:25.57| [main_task] I (null) btrmc_mgmt.c:1284 btrmc_init() Initialize btrmc done.
+------------- [main finished] time checker app common clock = 25.587000000
+|09:00:25.59| [main_task] I SET_APP set_app_main.c:196 set_app_main_task() ############-----------------RRRRRRRRRRRRRRIIIIIIIIIIIIIIIII
+
+|09:00:25.60| [main_task] I SET_APP set_app_main.c:206 set_app_main_task() PM state transition is unlocked
+
+ble_tizenrt_scatternet_gap_app_callback: [APP] ADV stopped: reason 0x0 
+SEND_PACKET : D0 C0 02 13 00 00 00 00 00 1F FE 15 04 07 80 01 F0 A9 02 4B 52 35 E0
+RECV_PACKET : D0 C0 02 13 00 00 00 00 00 1F FE 15 05 07 80 01 F0 A9 02 4B 52 34 E0
+ble_tizenrt_scatternet_gap_app_callback: [APP] ADV started: adv_type 0  
+|09:00:26.44| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+}=AQ�������Rj�[PMC-I] LP WAKE AP HANDLER 4010 0�݅��������ѕɁ͚��j����͕����5m1A
+[LP�r�݂]�Rjԕ�+k֫K�        j������Minicom2.8pm_set_wakeup_timer: Setting tim�Ɂ���� ��ɑ�ݥ���݅��������ѕɁɪ��j����͕����55R��5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                                �Ju�
+[LP�i*��UI��*�+k֫K�      j������Minicom2.8pm_set_wakeup_timer: Setting timer and Board will wake up after 1736 millisecond
+[LPCAP-I] CA7PG-
+[PMC-I] LP WAKE AP HANDLER 90 0
+[LPCAnu�u�I��|09:00:30.40| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+pm_set_wakeup_timer: Setting tim�Ɂ����  ��ɑ�ݥ���݅��������ѕɁ���j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                           �Ju�
+[LPT��P�UI��*�+k֫K��8MinicoSEND_PACKET : D0 C0 02 0F 00 00 00 00 00 20 FC 94 04 03 89 01 00 DA E0
+RECV_PACKET : D0 C0 02 0F 00 00 00 00 00 20 FC 94 05 03 89 01 00 DB E0
+pm_set_wakeup_timer: Setting timeȁ����  ��ɑ�ݥ���݅��������ѕɁ����j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                           �Ju�
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0up_timer: Setting t���Ɂ����   ��ɑ�ݥ���݅��������ѕɁ���j����͕����5m1A
+[LP[i*��UI��*�+k֫K�      j������Minicom2.8pm_set_wakeup_timer: Setting timeȁ���� ��ɑ�ݥ���݅��������ѕɁݢ��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                                  �Ju�
+[LP CA7PW-
+Minicom2.8Minico|09:00:33.14| [AUTO_RECONNECTION] I (null) auto_reconnection_manager.c:56 auto_reconnection_func() auto_reconnection_task_running_state(1)
+|09:00:33.33| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4W�,ZX�X,]Y��is too long, maximum length is 128
+TASH>>nicom2.8MinicoMinicom2.8pm_set_wakeup_timer: Setting time������   ��ɑ�ݥ���݅��������ѕɁق��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                          �Ju�
+[LPs\ CA7PW-
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0ng tO��Ɂ����  ��ɑ�ݥ���݅��������ѕɁբ��j����͕����5m1A
+[LP�� CA7PW-
+Minicom2.8Minicopm_set_wakeup_timer: Setting timer����� ��ɑ�ݥ���݅��������ѕɁ����j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                           �Ju�
+[LP�i*��UI��*�+k֫K�      j������Minicom2.8pm_set_wakeup_timer: Setting tim/Ɂ���� ��ɑ�ݥ���݅��������ѕɁт��j����͕����55R��5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                                �Ju�
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0m_set_wakeup_timer: Setting tH��Ɂ���� ��ɑ�ݥ���݅��������ѕɁ͒��j����͕����5m1A
+[LP�� CA7PW-
+Minicom2.8Minicopm_set_wakeup_timer: Setting timer�
+                                                   ���  ��ɑ�ݥ���݅��������ѕɁɲ��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 W�,ZX�X,]Y��is too long, maximum length is 128             �Ju�
+TASH>>com2.8Minicopm_set_wakeup_timer: Setting timer and Board will wake up after 2099 millisecond
+[LPCAP-I] CA7PG-
+[PMC-I] LP WAKE AP HANDLER 90 0
+[LPCA\u�u�I��|09:00:40.60| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+|09:00:40.76| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+pm_set_wakeup_timer: Setting tim/Ɂ����  ��ɑ�ݥ���݅��������ѕɁ�ª�j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                          �Ju�
+[LP#i*��UI��*�+k֫K�      j������Minicom2.8SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 21 FC 94 04 03 89 01 00 DB E0
+RECV_PACKET : D0 C0 02 0F 00 00 00 00 00 21 FC 94 05 03 89 01 00 DA E0
+[LPCAP-I] CA7PG-mer: Setting timer and Board will wake up after 8756 millisecond
+
+[PMC-I] LP WAKE AP HANDLER 90 0
+[LPCA҆A7PW-
+|09:00:51.06| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+�A�)jR��[PMC-I] LP WAKE AP HANDLER 4010 0�ɑ�ݥ���݅��������ѕɁ���j����͕����55�1A
+[LPK��CA7PW-
+Minicom2.8MinicoSEND_PACKET : D0 C0 02 0F 00 00 00 00 00 22 FC 94 04 03 89 01 00 D8 E0
+RECV_PACKET : D0 C0 02 0F 00 00 00 00 00 22 FC 94 05 03 89 01 00 D9 E0
+�A�)jRl�[PMC-I] LP WAKE AP HANDLER 4010 0�ɑ�ݥ���݅��������ѕɁ���j����͕����55�1A
+[LP��u�u�I��*�+k֫K�      j������Minicom2.8pm_set_wakeup_timer: Setting time΁���� ��ɑ�ݥ���݅��������ѕɁ����j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                                   �Ju�
+[LPi*��UI��*�+k֫K�       j������Minicom2.8pm_set_wakeup_timer: Setting timer and Board will wake up after 7189 millisecond
+[LPCAP-I] CA7PG-
+[PMC-I] LP WAKE AP HANDLER 90 0
+[LPCA݂]�Rj�Minicom2.8|09:01:01.33| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+|09:01:01.44| [AUTO_RECONNECTION] I (null) auto_reconnection_manager.c:56 auto_reconnection_func() auto_reconnection_task_running_state(1)
+|09:01:01.65| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 23 FC 94 04 03 89 01 00 D9 E0
+RECV_PACKET : D0 C0 02 0F 00 00 00 00 00 23 FC 94 05 03 89 01 00 D8 E0
+pm_set_wakeup_timer: Setting timer and Board will wake up after 8766 millisecond
+[LPCAP-I] CA7PG-
+[PMC-I] LP WAKE AP HANDLER 90 0
+[LPCA�u�u�I��|09:01:11.61| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+pm_set_wakeup_timer: Setting ti��Ɂ����  ��ɑ�ݥ���݅��������ѕɁ庺�j����͕����55R�E5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                       �Ju�
+]�Rjԕ�+k֫K�      j�5RjDj�Jb���ѡ�z��J���с��Ʌ�ѕɁJ́����b����j�᥵յ�b���ѡ�J́���j�Ԉj���䥍��Minicom2.8SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 24 FC 94 04 03 89 01 00 DE E0
+RECV_PACKET : D0 C0 02 0F 00 00 00 00 00 24 FC 94 05 03 89 01 00 DF E0
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0ɑ�ݥ���݅��������ѕɁẺ�j����͕����5m1A
+[LPC^ CA7PW-
+�A�5Rj$��[PMC-I] LP WAKE AP HANDLER 4010 0ng t���Ɂ����  ��ɑ�ݥ���݅��������ѕɁኺ�j����͕����5m1A
+[LP\ CA7PW-
+Minicom2.8Minicopm_set_wakeup_timer: Setting tim�Ɂ����  ��ɑ�ݥ���݅��������ѕɁݪ��j����͕����55R��5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 (TKRW�W��YH�[M�C+ST(                                     �Ju�
+                                                            U)�����UI�h�
+                                                                        5*
+                                                                          U)�i*��U�*�+k֫K�       j�����)j�Minicom2.8Minicom2.8pm_set_wakeup_timer: Setting timer
+                                                                                                                                                                ��� ��ɑ�ݥ���݅��������ѕɁٲ��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                                                                                                                    �
+[LP#� CA7PW-
+Minicom2.8Minico|09:01:15.54| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+pm_set_wakeup_timer: Setting timer ���� ��ɑ�ݥ���݅��������ѕɁق��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                          �Ju�
+[LP�k�݂]�Rjԕ�+k֫K�        j������Minicom2.8pm_set_wakeup_timer: Setting time������        ��ɑ�ݥ���݅��������ѕɁՒ��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 40W�,ZX�X,]Y��is too long, maximum length is 128                                                �Ju�
+TASH>>com2.8MinicoMinicom2.8pm_set_wakeup_timer: Setting time������     ��ɑ�ݥ���݅��������ѕɁѢ��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                          �Ju�
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0m_set_wakeup_timer: Setting tǵ�Ɂ����  ��ɑ�ݥ���݅��������ѕɁͲ��j����͕����5m1A
+[LP� CA7PW-
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0ng t���Ɂ����  ��ɑ�ݥ���݅��������ѕɁ͂��j����͕����5m1A
+[LP�^ CA7PW-
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0ng t���Ɂ����  ��ɑ�ݥ���݅��������ѕɁɢ��j����͕����5m1A
+]�Rjԕ�+k֫K�      j������Minicom2.8pm_set_wakeup_timer: Setting time������        ��ɑ�ݥ���݅��������ѕɁŲ��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                                  �Ju�
+[LP*��UI��*�+k֫K�        j������Minico
+TASH: length of input character is too long, maximum length is 128
+TASH>>m2.8|09:01:20.47| [AUTO_RECONNECTION] I (null) auto_reconnection_manager.c:56 auto_reconnection_func() auto_reconnection_task_running_state(1)
+|09:01:20.70| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+pm_set_wakeup_timer: Setting timer and Board will wake up after 875 millisecond
+[LPCAP-I] CA7PG-
+[PMC-I] LP WAKE AP HANDLER 90 0
+[LPCA��݂]�Rj�Minicom2.8|09:01:21.77| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 25 FC 94 04 03 89 01 00 DF E0
+RECV_PACKET : D0 C0 02 0F 00 00 00 00 00 25 FC 94 05 03 89 01 00 DE E0
+pm_set_wakeup_timer: Setting tio�Ɂ����  ��ɑ�ݥ���݅��������ѕɁ�ª�j����͕����55R��5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                        �Ju�
+[LPci*��UI��*�+k֫K�      j������Minicom2.8pm_set_wakeup_timer: Setting timKr and Board will wake up after 8053 millisecond
+[LPCAP-I] CA7PG-
+[PMC-I] LP WAKE AP HANDLER 90 0
+[LPCA0�A7PW-
+|09:01:31.86| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 26 FC 94 04 03 89 01 00 DC E0
+RECV_PACKET : D0 C0 02 0F 00 00 00 00 00 26 FC 94 05 03 89 01 00 DD E0
+�A�5Rj$��[PMC-I] LP WAKE AP HANDLER 4010 0ɑ�ݥ���݅��������ѕɁ��²j����͕����5m1A
+[LP�i*��UI��*�+k֫K�      j������Minicom2.8pm_set_wakeup_timer: Setting time������        ��ɑ�ݥ���݅��������ѕɁ�²j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                                          �Ju�
+[LP㬐CA7PW-
+Minicom2.8Minicopm_set_wakeup_timer: Setting tim�Ɂ����  ��ɑ�ݥ���݅��������ѕɁݢ²j����͕����55R��5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                                       �Ju�
+[LP\ CA7PW-
+Minicom2.8Minico|09:01:34.74| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0ɑ�ݥ���݅��������ѕɁ��²j����͕����5m1A
+�A�5RjT��[PMC-I] LP WAKE AP HANDLER 4010 0up_timer: Setting t���Ɂ����   ��ɑ�ݥ���݅��������ѕɁْ²j����͕����5m1A
+[LP�VH�P�UI��*�+k֫K�     j���5RjDj�Jb���ѡ�z��J���с��Ʌ�ѕɁJ́����b����j�᥵յ�b���ѡ�J́���j�Ԉj���4��pm_set_wakeup_timer: Setting tim/Ɂ����                ��ɑ�ݥ���݅��������ѕɁղ²j����͕����55R�e5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                                                                                               �Ju�
+[LP� CA7PW-
+Minicom2.8Minicopm_set_wakeup_timer: Setting timer����� ��ɑ�ݥ���݅��������ѕɁՂ²j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                         �Ju�
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0up_timer: Setting t���Ɂ����   ��ɑ�ݥ���݅��������ѕɁѢ²j����͕����5m1A
+�A�)jR��[PMC-I] LP WAKE AP HANDLER 4010 0pm_set_wakeup_timer: Setting tih�Ɂ���� ��ɑ�ݥ���݅��������ѕɁͲ²j����͕����55�1A
+[LP���CA7PW-
+Minicom2.8Minicopm_set_wakeup_timer: Setting timer and Board will wake up after 3086 millisecond
+[LPCAP-I] CA7PG-
+[PMC-I] LP WAKE AP HANDLER 90 0
+[LPCA݂]�Rj�Minicom2.8|09:01:42.17| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 27 FC 94 04 03 89 01 00 DD E0
+RECV_PACKET : D0 C0 02 0F 00 00 00 00 00 27 FC 94 05 03 89 01 00 DC E0
+|09:01:42.72| [AUTO_RECONNECTION] I (null) auto_reconnection_manager.c:56 auto_reconnection_func() auto_reconnection_task_running_state(1)
+|09:01:42.98| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+[LPCAP-I] CA7PG-mer: Setting timer and Board will wake up after 8794 millisecond
+
+[PMC-I] LP WAKE AP HANDLER 90 0
+[LPCA�u�u�I��|09:01:52.48| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+�A�)jRt�[PMC-I] LP WAKE AP HANDLER 4010 0�ɑ�ݥ���݅��������ѕɁ���j����͕����55�1A
+[LP#\ CA7PW-
+Minicom2.8MinicoSEND_PACKET : D0 C0 02 0F 00 00 00 00 00 28 FC 94 04 03 89 01 00 D2 E0
+RECV_PACKET : D0 C0 02 0F 00 00 00 00 00 28 FC 94 05 03 89 01 00 D3 E0
+�A�)jR��[PMC-I] LP WAKE AP HANDLER 4010 0�ɑ�ݥ���݅��������ѕɁ���j����͕����55�1A
+[LPs�݂]�Rjԕ�+k֫K�         j������Minicom2.8
+TASH: length of input character is too long, maximum length is 128
+�A�5RjD��[PMC-I] LP WAKE AP HANDLER 4010 0��    ��ɑ�ݥ���݅��������ѕɁ����j����͕����5m1A
+[LP^ CA7PW-
+Minicom2.8Minicopm_set_wakeup_timer: Setting tim�Ɂ����  ��ɑ�ݥ���݅��������ѕɁݒ��j����͕����55R��5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                                        �Ju�
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0m_set_wakeup_timer: Setting t���Ɂ���� ��ɑ�ݥ���݅��������ѕɁ٢��j����͕����5m1A
+�A�)jRT�[PMC-I] LP WAKE AP HANDLER 4010 0pm_set_wakeup_timer: Setting ti��Ɂ���� ��ɑ�ݥ���݅��������ѕɁղ��j����͕����55�1A
+[LPî�CA7PW-
+Minicom2.8Minico|09:01:56.92| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+pm_set_wakeup_timer: Setting time������ ��ɑ�ݥ���݅��������ѕɁՂ��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                          �Ju�
+[LP��CA7PW-
+Minicom2.8Minicopm_set_wakeup_timer: Setting timeȁ����  ��ɑ�ݥ���݅��������ѕɁѢ��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                          �Ju�
+�A�)jRT�[PMC-I] LP WAKE AP HANDLER 4W�,ZX�X,]Y��is too long, maximum length is 128ɑ�ݥ���݅��������ѕɁͲ��j����͕����55�1A
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0etting t���Ɂ����      ��ɑ�ݥ���݅��������ѕɁ͂��j����͕����5m1A
+[LPcT��P�UI��*�+k֫K�     j������pm_set_wakeup_timer: Setting tim�Ɂ����   ��ɑ�ݥ���݅��������ѕɁɢ��j����͕����55R��5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                        �Ju�
+�A�)jRt�[PMC-I] LP WAKE AP HANDLER 4010 0eup_timer: Setting ti��Ɂ����   ��ɑ�ݥ���݅��������ѕɁ����j����͕����55�1A
+[LP#��CA7PW-
+Minicom2.8Minicopm_set_wakeup_timer: Setting timer
+                                                  ���   ��ɑ�ݥ���݅��������ѕɁŒ��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                          �Ju�
+[LP3� CA7PW-
+Minicom2.8Minicopm_set_wakeup_timer: Setting time΁����  ��ɑ�ݥ���݅��������ѕɁ���j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                          �Ju�
+[LP��݂]�Rjԕ�+k֫K�         j������|09:02:01.82| [AUTO_RECONNECTION] I (null) auto_reconnection_manager.c:56 auto_reconnection_func() auto_reconnection_task_rMinicom2.8unning_state(1)
+|09:02:02.11| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+|09:02:02.81| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+�A�)jR��[PMC-I] LP WAKE AP HANDLER 4010 0�ɑ�ݥ���݅��������ѕɁ�ʒ�j����͕����55�1A
+[LP�S CA7PW-
+Minicom2.8MinicoSEND_PACKET : D0 C0 02 0F 00 00 00 00 00 29 FC 94 04 03 89 01 00 D3 E0
+�A�)jR��[PMC-I] LP WAKE AP HANDLER 4010 0�ɑ�ݥ���݅��������ѕɁ傒�j����͕����55�1A
+[LP3� CA7PW-
+Minicom2
+TASH: length of input character is too long, maximum length is 128
+TASH>>.8Minico|09:02:04.29| [MICOM_RETRANSER] W SCUBE scube.c:617 scube_parse_handler_retrans_fail() Retrans fail, frameid : 41, cludter id : FC94, try_count : 0
+pm_set_wakeup_timer: Setting timeЁ����  ��ɑ�ݥ���݅��������ѕɁᢊ�j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                         �Ju�
+[LP#� CA7PW-
+Minicom2.8MinicoSEND_PACKET : D0 C0 02 0F 00 00 00 00 00 29 FC 94 04 03 89 01 00 D3 E0
+�A�5Rj���[PMC-I] LP WAKE AP HANDLER 4010 0ɑ�ݥ���݅��������ѕɁݪ��j����͕����5m1A
+[LP�*H�P�UI��*�+k֫K�     j������|09:02:05.77| [MICOM_RETRANSER] W SCUBE scube.c:617 scube_parse_handler_retrans_fail() Retrans fail, frameid : 41, cludter id : FC94, try_count : 1
+pm_set_wakeup_timer: Setting timer�
+                                   ���  ��ɑ�ݥ���݅��������ѕɁ�ʊ�j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                          �Ju�
+[LP㬐CA7PW-
+Minicom2.8MinicoSEND_PACKET : D0 C0 02 0F 00 00 00 00 00 29 FC 94 04 03 89 01 00 D3 E0
+pm_set_wakeup_timer: Setting tim�Ɂ����  ��ɑ�ݥ���݅��������ѕɁي��j����͕����55R�e5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                        �Ju�
+[LP�q�݂]�Rjԕ�+k֫K�        j������Minicom2.8|09:02:07.20| [MICOM_RETRANSER] W SCUBE scube.c:617 scube_parse_handler_retrans_fail() Retrans fail, frameid : 41, cludter id : FC94, try_count : 2
+|09:02:07.25| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+�A�)jRT�[PMC-I] LP WAKE AP HANDLER 4010 0�ɑ�ݥ���݅��������ѕɁ՚��j����͕����55�1A
+[LP*��UI��*�+k֫K�        j������Minicom2.8SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 29 FC 94 04 03 89 01 00 D3 E0
+�A�5RjD��[PMC-I] LP WAKE AP HANDLER 4010 0ɑ�ݥ���݅��������ѕɁѢ��j����͕����5m1A
+[LP*H�P�UI��*�+k֫K�      j������|09:02:08.68| [MICOM_RETRANSER] E SCUBE scube.c:635 scube_parse_handler_retrans_fail() NE60 Scube send failure Dst Address : 0x0000 , ClusterID : 0xFC94, Cmdid : 04, length1
+Add log time : 1713398528, code : NE60, level : 10, message : 0000, FC94, 04, 3, 1, 89
+[LOGBUF] SSM : NE60, 0000, FC94, 04, 3, 1, 89
+|09:02:08.70| [MICOM_RETRANSER] E SCUBE scube.c:649 scube_parse_handler_retrans_fail() Retrans timeout, frameid : 41, cludter id : FC94, try_count : 3
+�A�)jR��[PMC-I] LP WAKE AP HANDLER 401W�,ZX�X,]Y��is too long, maximum length is 128
+TASH>>com2.8Minicopm_set_wakeup_timer: Setting time΁����        ��ɑ�ݥ���݅��������ѕɁ͊��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                  �Ju�
+[LPc�݂]�Rjԕ�+k֫K�         j������Minicom2.8pm_set_wakeup_timer: Setting timeȁ���� ��ɑ�ݥ���݅��������ѕɁɚ��j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                                  �Ju�
+�A�)jR��[PMC-I] LP WAKE AP HANDLER 4010 0eup_timer: Setting tig�Ɂ����   ��ɑ�ݥ���݅��������ѕɁź��j����͕����55�1A
+[LP�i*��UI��*�+k֫K�      j������Minicom2.8pm_set_wakeup_timer: Setting ti��Ɂ���� ��ɑ�ݥ���݅��������ѕɁ���j����͕����55R�E5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                                                                �Ju�
+[LP#q�݂]�Rjԕ�+k֫K�        j������Minicom2.8|09:02:12.11| [AUTO_RECONNECTION] I (null) auto_reconnection_manager.c:56 auto_reconnection_func() auto_reconnection_task_running_state(1)
+|09:02:12.42| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+pm_set_wakeup_timer: Setting tim/Ɂ����  ��ɑ�ݥ���݅��������ѕɁ�ʢj����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                         �Ju�
+[LP�i*��UI��*�+k֫K�      j������Minico
+TASH: length of input character is too long, maximum length is 128
+TASH>>m2.8|09:02:13.13| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 2A FC 94 04 03 89 01 00 D0 E0
+[LPCAP-I] CA7PG-mer: Setting timer and Board will wake up after 9220 millisecond
+
+[PMC-I] LP WAKE AP HANDLER 90 0
+[LPCA4*��UI��|09:02:23.18| [MICOM_RETRANSER] W SCUBE scube.c:617 scube_parse_handler_retrans_fail() Retrans fail, frameid : 42, cludter id : FC94, try_count : 0
+|09:02:23.37| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 2A FC 94 04 03 89 01 00 D0 E0
+pm_set_wakeup_timer: Setting tim�Ɂ����  ��ɑ�ݥ���݅��������ѕɁ墚�j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                         �Ju�
+[LP��u�u�I��*�+k֫K�      j������Minicom2.8|09:02:24.28| [OCF_KEEPALIVE] I OCF keepalive_apis.c:327 keepalive_task_func() keepalive task stopped
+|09:02:24.49| [MICOM_RETRANSER] W SCUBE scube.c:617 scube_parse_handler_retrans_fail() Retrans fail, frameid : 42, cludter id : FC94, try_count : 1
+pm_set_wakeup_timer: Setting timer�
+                                   ���  ��ɑ�ݥ���݅��������ѕɁᲚ�j����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                         �Ju�
+[LP��CA7PW-
+Minicom2.8MinicoSEND_PACKET : D0 C0 02 0F 00 00 00 00 00 2A FC 94 04 03 89 01 00 D0 E0
+pm_set_wakeup_timer: Setting timer and Board will wake up after 7931 millisecond
+[LPCAP-I] CA7PG-
+[PMC-I] LP WAKE AP HANDLER 4010 0
+[LPss�݂]�RjԤ��U�*)'H�[Y��m2.8Minicom2.8MinicoMinicom2.8Minicom2.8Minico) not registered
+TASH>>Minicom2.8|09:02:27.43| [MICOM_RETRANSER] W SCUBE scube.c:617 scube_parse_handler_retrans_fail() Retrans fail, frameid : 42, cludter id : FC94, try_count : 2
+SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 2A FC 94 04 03 89 01 00 D0 E0                                             
+�A�)jR��[PMC-I] LP WAKE AP HANDLER 4010 0ɑ�ݥ���݅��������ѕɁ��ʒj����͕����55�1A                                        |
+[LPK� CA7PW-                                                                                                       
+Minicom2.8Minico|09:02:28.68| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+|09:02:28.89| [MICOM_RETRANSER] E SCUBE scube.c:635 scube_parse_handler_retrans_fail() NE60 Scube send failure Dst Address : 0x0000 , ClusterID : 0xFC94, Cmdid : 04, length : 3, number of attribute : 1
+Add log time : 1713398548, code : NE60, level : 10, message : 0000, FC94, 04, 3, 1, 89
+[LOGBUF] SSM : NE60, 0000, FC94, 04, 3, 1, 89
+|09:02:28.92| [MICOM_RETRANSER] E SCUBE scube.c:649 scube_parse_handler_retrans_fail() Retrans timeout, frameid : 42, cludter id : FC94, try_count : 3
+pm_set_wakeup_timer: Setting tim(Ɂ����  ��ɑ�ݥ���݅��������ѕɁњʒj����͕����55R��5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                       �Ju�
+[LP#� CA7PW-
+Minicom2.8MinicoSEND_PACKET : D0 C0 02 0F 00 00 00 00 00 2B FC 94 04 03 89 01 00 D1 E0
+pm_set_wakeup_timer: Setting time΁����  ��ɑ�ݥ���݅��������ѕɁͪʒj����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                         �Ju�
+[LP�x�݂]�Rjԕ�+k֫K�        j������Minicom2.8|09:02:30.30| [MICOM_RETRANSER] W SCUBE scube.c:617 scube_parse_handler_retrans_fail() Retrans fail, frameid : 43, cludter id : FC94, try_count : 0
+pm_set_wakeup_timer: Setting tim=Ɂ����  ��ɑ�ݥ���݅��������ѕɁɺʒj����͕����55R��5
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0                                       �Ju�
+[LPcVH�P�UI��*�+k֫K�     j������SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 2B FC 94 04 03 89 01 00 D1 E0
+�A�)jR��[PMC-I] LP WAKE AP HANDLER 4010 0�ɑ�ݥ���݅��������ѕɁɂʒj����͕����55�1A
+[LPˬ�CA7PW-
+Minicom2.8Minico|09:02:31.78| [MICOM_RETRANSER] W SCUBE scube.c:617 scube_parse_handler_retrans_fail() Retrans fail, frameid : 43, cludter id : FC94, try_count : 1
+pm_set_wakeup_timer: Setting timeȁ����  ��ɑ�ݥ���݅��������ѕɁŢʒj����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 4010 0                                         �Ju�
+[LP�o�݂]�Rjԕ�+k֫K�        j������Minicom2.8SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 2B FC 94 04 03 89 01 00 D1 E0
+pm_set_wakeup_timer: Setting timer�
+                                   ���  ��ɑ�ݥ���݅��������ѕɁ�ʒj����͕����55Rj��5
+�A�)j�[PMC-I] LP WAKE AP HANDLER 401W�,ZX�X,]Y��is too long, maximum length is 128u�
+TASH>>nicom2.8Minico|09:02:33.21| [MICOM_RETRANSER] W SCUBE scube.c:617 scube_parse_handler_retrans_fail() Retrans fail, frameid : 43, cludter id : FC94, try_count : 2
+|09:02:33.49| [AUTO_RECONNECTION] I (null) auto_reconnection_manager.c:56 auto_reconnection_func() auto_reconnection_task_running_state(1)
+|09:02:33.52| [UartWatchDog] I SCUBE main_uartwatchdog.c:30 main_uartwatchdog_kick_cb() Send Wifi Status To Micom status : 0x0
+FLAG4
+pm_timer_create: pid of the timer is 33
+pm_timer_add: timer->delay is 10000
+pm_timer_add: timer added in the head of linked list
+SEND_PACKET : D0 C0 02 0F 00 00 00 00 00 2B FC 94 04 03 89 01 00 D1 E0
+|09:02:33.82| [OtnService] I OTN OtnDownloader.cpp:371 waitNetworkConnection() OTN Service is waiting until network connection
+�A�5Rj�[PMC-I] LP WAKE AP HANDLER 4010 0��ɑ�ݥ���݅��������ѕɁ嚢�j����͕����55R�1A
+]�Rjԕ�+k֫K�      j������Minicom2.8|09:02:34.67| [MICOM_RETRANSER] E SCUBE scube.c:635 scube_parse_handler_retrans_fail() NE60 Scube send failure Dst Address : 0x0000 , ClusterID : 0xFC94, Cmdid : 04, leng1
+Add log time : 1713398554, code : NE60, level : 10, message : 0000, FC94, 04, 3, 1, 89
+[LOGBUF] SSM : NE60, 0000, FC94, 04, 3, 1, 89
+|09:02:34.69| [MICOM_RETRANSER] E SCUBE scube.c:649 scube_parse_handler_retrans_fail() Retrans timeout, frameid : 43, cludter id : FC94, try_count : 3
+[LPCAP-I] CA7PG-mer: Setting timer and Board will wake up after 8525 millisecond
+
+
+

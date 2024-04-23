@@ -460,7 +460,7 @@
 #define PMIOC_RESUME             _PMIOC(0x0002)
 #define PMIOC_TIMEDSTAY          _PMIOC(0x0003)
 #define PMIOC_TIMEDSTAY_CANCEL   _PMIOC(0x0004)
-#define PMIOC_TIMER_SET          _PMIOC(0x0005)
+#define PMIOC_SLEEP              _PMIOC(0x0005)
 #ifdef CONFIG_PM_DVFS
 #define PMIOC_TUNEFREQ           _PMIOC(0x0006)
 #endif

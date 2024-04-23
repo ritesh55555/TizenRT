@@ -16,7 +16,7 @@
  *
  ****************************************************************************/
 /************************************************************************
- * pm/pm_timer/pm_timer_add.c
+ * pm/pm_sleep.c
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -52,7 +52,8 @@
  ************************************************************************/
 
 #include <tinyara/pm/pm.h>
-#include "pm_timer.h"
+#include <tinyara/irq.h>
+#include <pm_timer/pm_timer.h>
 
 /************************************************************************
  * Pre-processor Definitions
@@ -63,11 +64,7 @@
  ************************************************************************/
 
 /************************************************************************
- * Public Variables
- ************************************************************************/
-
-/************************************************************************
- * Private Functions
+ * Private Variables
  ************************************************************************/
 
 /************************************************************************
@@ -75,72 +72,52 @@
  ************************************************************************/
 
 /************************************************************************
- * Name: pm_timer_add
+ * Name: pm_sleep
  *
  * Description:
- *   This function adds a wakeup timer in the g_pmTimer_activeList. So that it will be
- *   invoked just before sleep when needed. 
+ *   This function allows the board to sleep for given time interval.
+ *   When this function is called, it is expected that board will sleep for 
+ *   given duration of time. But for some cases board might not go 
+ *   to sleep instantly if :
+ * 	1. system is in pm lock (pm state transition is locked)
+ *      2. Other threads(other than idle) are running
+ *      3. NORMAL to SLEEP state threshold time is large
  * 
  * Parameters:
- *   pm_wakeup_timer_s pointer
+ *   timer_interval - expected board sleep duration
  *
  * Return Value:
- *   None
- * 
+ *   0 - success
+ *   -1 - error
+ *
  ************************************************************************/
 
-void pm_timer_add(pm_wakeup_timer_t *timer)
+int pm_sleep(int timer_interval)
 {
-        /* Case where there are no timers in the list */
-
-        if (g_pmTimer_activeList.head == NULL) {
-                sq_addlast((FAR sq_entry_t *)timer, &g_pmTimer_activeList);
+        pm_wakeup_timer_t *timer = pm_timer_create();
+        irqstate_t state;
+        if (timer == NULL) {
+                pmdbg("Unable to create pm timer\n");
+                return PM_TIMER_FAIL;
         }
+
+        /* initialize the timer's semaphore. It will be used to lock the
+         * thread before sleep and unlock after expire */
+        sem_init(&timer->pm_sem, 0, 0);
         
-        /* We should add the timer in the sorted position of delay time */
+        /* Now add the timer in the list 
+         * Adding a wakeup timer in the linked list should be atomic.
+         * Otherwise there is a chance of wrong ordering of the list.*/
+        state = enter_critical_section();
+        
+        /* Add the timer in the g_pmTimer_activeList */
+        timer->delay = timer_interval;
+        pm_timer_add(timer);
 
-         else {
-                pm_wakeup_timer_t *curr;
-                pm_wakeup_timer_t *prev;
-                prev = curr = (pm_wakeup_timer_t *)g_pmTimer_activeList.head;
-                unsigned int now = 0;
+        leave_critical_section(state);
 
-                /* Advance to positive time */
-                while ((now += curr->delay) < 0 && curr->next) {
-                        prev = curr;
-                        curr = curr->next;
-                }
-
-                /* Advance past shorter delays */
-                while (now <= timer->delay && curr->next) {
-                        prev = curr;
-                        curr = curr->next;
-                        now += curr->delay;
-                }
-
-                /* timer should be added before the curr */
-                if (timer->delay < now) {
-                        
-                        timer->delay -= (now - curr->delay);
-                        curr->delay -= timer->delay;
-                        if (curr == (pm_wakeup_timer_t *)g_pmTimer_activeList.head) {
-                                sq_addfirst((FAR sq_entry_t *)timer, &g_pmTimer_activeList);
-                        } else {
-                                sq_addafter((FAR sq_entry_t *)prev, (FAR sq_entry_t *)timer, &g_pmTimer_activeList);
-                        }  
-
-                /* timer expire time is greater than every other timer. 
-                 * timer should be added to the end of the linked list*/
-                } else {
-                        timer->delay -= now;
-                        if (!curr->next) {
-                                sq_addlast((FAR sq_entry_t *)timer, &g_pmTimer_activeList);
-                        } else {
-                                sq_addafter((FAR sq_entry_t *)curr, (FAR sq_entry_t *)timer, &g_pmTimer_activeList);
-                        }
-                }
-        }
-
+        /* sem_wait untill the timer expires */      
+        sem_wait(&timer->pm_sem);
+        
+        return PM_TIMER_SUCCESS;
 }
-
-

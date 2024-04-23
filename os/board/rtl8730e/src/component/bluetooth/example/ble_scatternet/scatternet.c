@@ -294,7 +294,9 @@ static rtk_bt_evt_cb_ret_t ble_tizenrt_scatternet_gap_app_callback(uint8_t evt_c
         if (!conn_ind->err) {
 #ifdef CONFIG_PM
             /* Set PM lock timer for 10 minutes */
-            pm_set_timer(PM_LOCK_TIMER, 600000000);
+            if (pm_timedStay(600000000) != 0) {
+                pmvdbg("Unable to perform pm_timedStay\n");
+            }
 #endif
             role = conn_ind->role ? "slave" : "master";
             dbg("[APP] Connected, handle: %d, role: %s, remote device: %s\r\n", 

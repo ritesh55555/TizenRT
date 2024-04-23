@@ -72,8 +72,9 @@ static ssize_t pm_write(FAR struct file *filep, FAR const char *buffer, size_t l
  * Command description:
  *   PMIOC_SUSPEND - for locking a specific PM state  
  *   PMIOC_RESUME - for unlocking a specific PM state
- *   PMIOC_TIMER_LOCK - for locking PM transition for certain time interval
- *   PMIOC_TIMER_SET - to set a wakeup timer
+ *   PMIOC_TIMEDSTAY - for locking PM transition for certain time interval
+ *   PMIOC_TIMEDSTAY_CANCEL - for stopping the timedstay lock timer
+ *   PMIOC_SLEEP - to make board sleep for given time
  *   PMIOC_TUNEFREQ - for changing the operating frequency of the core to save power
  * 
  * Arguments:
@@ -83,7 +84,7 @@ static ssize_t pm_write(FAR struct file *filep, FAR const char *buffer, size_t l
  *   for PMIOC_RESUME, arg is unsigned long representing PM STATE
  *   for TIMEDSTAY, arg should be a unsigned type (timer interval in micro second).
  *   for TIMEDSTAY_CANCEL, arg not required
- *   for TIMER_SET, arg should be an unsigned int.
+ *   for SLEEP, arg should be an int.
  *   for TUNEFREQ, arg should be an int type.
  *
  * Description:
@@ -115,8 +116,12 @@ static int pm_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
 	case PMIOC_TIMEDSTAY_CANCEL:
 		ret = pm_timedStay_cancel();
 		break;
-	case PMIOC_TIMER_SET:
-		ret = pm_timer_add((int)arg);
+	case PMIOC_SLEEP:
+		if (arg > 0) {
+			ret = pm_sleep((int)arg);
+		} else {
+			pmvdbg("Please input positive timer interval\n");
+		}
 		break;
 #ifdef CONFIG_PM_DVFS
         case PMIOC_TUNEFREQ:

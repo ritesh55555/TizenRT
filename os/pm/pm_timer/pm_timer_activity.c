@@ -83,6 +83,9 @@ void pm_timer_expire(void)
 		/* Remove the pm timer from active list */
         	sq_remfirst(&g_pmTimer_activeList);
 
+		/* As the timer is expired, give back the semaphore to unlock the thread */
+		sem_post(&head->pm_sem);
+
 		/* Make the pm timer free */
 		pm_timer_delete(head);
 	}
@@ -130,7 +133,7 @@ int pm_set_wakeup_timer(void)
 
 	if (curr->delay > 0) {
 		pmdbg("Setting timer and Board will wake up after %d millisecond\n", curr->delay);
-		pm_set_timer(PM_WAKEUP_TIMER, curr->delay * 1000);
+		up_set_pm_timer(curr->delay * 1000);
 	} 
 	
 	return PM_TIMER_SUCCESS;

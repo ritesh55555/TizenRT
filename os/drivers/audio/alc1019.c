@@ -1045,7 +1045,7 @@ FAR struct audio_lowerhalf_s *alc1019_initialize(FAR struct i2c_dev_s *i2c, FAR 
 	 * default state.
 	 */
 
-	/*reconfigure the ALC1019 hardwaqre */
+	/*reconfigure the ALC1019 hardware */
 	alc1019_reset_config(priv);
 	alc1019_exec_i2c_script(priv, codec_init_mute_on_script, sizeof(codec_init_mute_on_script) / sizeof(t_codec_init_script_entry));
 

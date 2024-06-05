@@ -126,7 +126,11 @@ void board_i2s_initialize(void)
 {
 #if defined(CONFIG_AUDIO_I2SCHAR) && defined(CONFIG_AMEBASMART_I2S)
 	i2schar_devinit();
+#ifdef CONFIG_PM
+	i2s_pminitialize();
 #endif
+#endif
+
 }
 
 void board_spi_initialize(void)
@@ -210,6 +214,9 @@ void board_i2c_initialize(void)
 		lldbg("Failed to register I2C\n");
 	}
 #endif
+#endif
+#ifdef CONFIG_PM
+	i2c_pminitialize();
 #endif
 #endif
 }

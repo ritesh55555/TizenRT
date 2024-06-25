@@ -66,7 +66,6 @@ void pm_wakehandler(clock_t missing_tick, pm_wakeup_reason_code_t wakeup_src)
 
 	/* After wakeup change PM State to STANDBY and reset the time slice */
 	pm_changestate(PM_STANDBY);
-	g_pmglobals.stime = clock_systimer();
 
 	leave_critical_section(flags);
 }

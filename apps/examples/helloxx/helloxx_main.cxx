@@ -89,7 +89,7 @@ static void take_sem(sem_t *sem)
 	} while (ret < 0);
 }
 
-int volume = 10;
+int volume = 5;
 
 extern "C"
 {
@@ -105,9 +105,9 @@ extern "C"
 		mp.create();
 		//auto source = std::move(unique_ptr<media::stream::FileInputDataSource>(new media::stream::FileInputDataSource(filePath)));
 		auto source = std::move(unique_ptr<BufferInputDataSource>(new BufferInputDataSource()));
-		source->setSampleRate(48000);
+		source->setSampleRate(24000);
 		//source->setChannels(1);
-		source->setChannels(2);
+		source->setChannels(1);
 		source->setPcmFormat(media::AUDIO_FORMAT_TYPE_S16_LE);
 		mp.setObserver(std::make_shared<_Observer>());
 		mp.setDataSource(std::move(source));
@@ -136,10 +136,9 @@ extern "C"
 			printf("failed to create background audio task\n");
 			return 0;
 		}
-		
+		sleep(10);	
 		while (true) {
-			sleep(1);
-			printf("keyword detected\n");
+			//printf("very very long long logssss very very long long logssss very very long long logssss very very long long logssss\n");
 		}
 	}
 }

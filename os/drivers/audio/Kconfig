@@ -180,6 +180,15 @@ config AUDIO_ALC1019
                 NOTE: This driver also depends on both I2C and I2S support although
                 that dependency is not explicit here.
 
+config AUDIO_SYU645B
+        bool "SYU645B DAC audio chip"
+        default n
+        depends on AUDIO && I2S && I2C && SCHED_WORKQUEUE
+        ---help---
+                Select to enable support for the SYU645B DAC Audio codec
+                NOTE: This driver also depends on both I2C and I2S support although
+                that dependency is not explicit here.
+
 config AUDIO_TAS5749
 	bool "TAS5749 DAC audio chip"
 	default n

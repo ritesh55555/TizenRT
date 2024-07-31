@@ -484,6 +484,10 @@ void board_initialize(void)
 #ifdef CONFIG_AUDIO_ALC1019
 	rtl8730e_alc1019_initialize(0);
 #endif
+#ifdef CONFIG_AUDIO_SYU645B
+	rtl8730e_syu645b_initialize(0);
+#endif
+
 	IPC_MSG_STRUCT ipc_msg_loguart;
 
 	ipc_msg_loguart.msg_type = IPC_USER_POINT;

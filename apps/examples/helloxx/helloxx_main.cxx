@@ -93,28 +93,34 @@ int volume = 5;
 
 extern "C"
 {
-	int play_audio(int argc, char *argv[])
+
+	int helloxx_main(int argc, char *argv[])
 	{
-		while (true) {
-		sleep(1);
 		sem_init(&tts_sem, 0, 0);
 		sem_init(&finished_sem, 0, 0);
+		printf("helloxx called\n");
 
-		filePath = "/mnt/48x16.pcm";
+		filePath = "/mnt/file.raw";
 
 		mp.create();
-		//auto source = std::move(unique_ptr<media::stream::FileInputDataSource>(new media::stream::FileInputDataSource(filePath)));
-		auto source = std::move(unique_ptr<BufferInputDataSource>(new BufferInputDataSource()));
+		printf("mp create done\n");
+		auto source = std::move(unique_ptr<media::stream::FileInputDataSource>(new media::stream::FileInputDataSource(filePath)));
+		//auto source = std::move(unique_ptr<BufferInputDataSource>(new BufferInputDataSource()));
 		source->setSampleRate(24000);
 		//source->setChannels(1);
 		source->setChannels(1);
 		source->setPcmFormat(media::AUDIO_FORMAT_TYPE_S16_LE);
 		mp.setObserver(std::make_shared<_Observer>());
+		printf("mp set observer done\n");
 		mp.setDataSource(std::move(source));
+		printf("mp set data source done\n");
 		mp.prepare();
+		printf("mp prepare done\n");
 		mp.setVolume(volume);
+		printf("mp set volume done\n");
 		
 		mp.start();
+		printf("mp start done\n");
 
 		take_sem(&tts_sem);
 
@@ -125,20 +131,6 @@ extern "C"
 		mp.unprepare();
 		mp.destroy();
 	
-		}
 		return 0;
-	}
-
-	int helloxx_main(int argc, char *argv[])
-	{
-		int pid = task_create("bgaudio", 100, 8192, play_audio, NULL);
-		if (pid < 0) {
-			printf("failed to create background audio task\n");
-			return 0;
-		}
-		sleep(10);	
-		while (true) {
-			//printf("very very long long logssss very very long long logssss very very long long logssss very very long long logssss\n");
-		}
 	}
 }

@@ -36,6 +36,10 @@
 
 #include <iostream>
 #include <memory>
+#include <fcntl.h>
+#include <tinyara/fs/ioctl.h>
+#include <sys/types.h>
+#include <tinyara/pm/pm.h>
 
 using namespace std;
 using namespace media;
@@ -89,7 +93,7 @@ static void take_sem(sem_t *sem)
 	} while (ret < 0);
 }
 
-int volume = 5;
+int volume = 8;
 
 extern "C"
 {
@@ -99,6 +103,9 @@ extern "C"
 		sem_init(&tts_sem, 0, 0);
 		sem_init(&finished_sem, 0, 0);
 		printf("helloxx called\n");
+
+		pm_suspend(PM_IDLE_DOMAIN);
+		printf("************ PM is suspended **************\n");
 
 		filePath = "/mnt/file.raw";
 
@@ -130,7 +137,10 @@ extern "C"
 
 		mp.unprepare();
 		mp.destroy();
-	
+
+		pm_resume(PM_IDLE_DOMAIN);
+		printf("************ PM is resumed **************\n");
+			
 		return 0;
 	}
 }

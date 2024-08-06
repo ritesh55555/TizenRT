@@ -1843,6 +1843,9 @@ errout_with_alloc:
 static void amebasmart_i2s_suspend(uint16_t port)
 {
 	struct amebasmart_i2s_s *priv = g_i2sdevice[port];
+	if (priv == NULL) {
+		printf("priv inside amebasmart i2s suspend is NULL\n");
+	}
 
 	i2s_disable(priv->i2s_object, 1);
 	kmm_free(priv->i2s_object);
@@ -1869,9 +1872,11 @@ static uint32_t rtk_i2s_suspend(uint32_t expected_idle_time, void *param)
 	(void)param;
 	/* Nothing to do here */
 #ifdef CONFIG_AMEBASMART_I2S2
+	printf("Before i2s num 2 suspend\n");
 	amebasmart_i2s_suspend(I2S_NUM_2);
 #endif
 #ifdef CONFIG_AMEBASMART_I2S3
+	printf("Before i2s num 3 suspend\n");
 	amebasmart_i2s_suspend(I2S_NUM_3);
 #endif
 

@@ -67,7 +67,7 @@
 #include <debug.h>
 
 #include <tinyara/audio/audio.h>
-
+#include <tinyara/mm/mm.h>
 #include "lib_internal.h"
 
 #if defined(CONFIG_AUDIO)

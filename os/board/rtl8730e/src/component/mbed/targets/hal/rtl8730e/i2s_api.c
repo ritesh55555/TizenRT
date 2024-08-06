@@ -611,9 +611,11 @@ void i2s_enable(i2s_t *obj)
   */
 void i2s_disable(i2s_t *obj, bool is_suspend)
 {
+	printf("Inside i2s_disable api\n");
 	SP_GDMA_STRUCT *l_SPGdmaStruct = &SPGdmaStruct;
 
 	if (obj->direction == I2S_DIR_TX) {
+		printf("FLAG 1\n");
 		GDMA_ClearINT(l_SPGdmaStruct->SpTxGdmaInitStruct.GDMA_Index, l_SPGdmaStruct->SpTxGdmaInitStruct.GDMA_ChNum);
 		GDMA_Cmd(l_SPGdmaStruct->SpTxGdmaInitStruct.GDMA_Index, l_SPGdmaStruct->SpTxGdmaInitStruct.GDMA_ChNum, DISABLE);
 		/* This function will do a deinit in the gdma channe, left here for future reference
@@ -623,11 +625,12 @@ void i2s_disable(i2s_t *obj, bool is_suspend)
 		AUDIO_SP_DmaCmd(obj->i2s_idx, DISABLE);
 		AUDIO_SP_TXStart(obj->i2s_idx, DISABLE);
 		if (is_suspend) {
+			printf("FLAG 3\n");
 			GDMA_ChnlFree(l_SPGdmaStruct->SpTxGdmaInitStruct.GDMA_Index, l_SPGdmaStruct->SpTxGdmaInitStruct.GDMA_ChNum);
 			AUDIO_SP_Deinit(obj->i2s_idx, obj->direction);
 		}
 	} else {
-
+		printf("FLAG 2\n");
 		GDMA_ClearINT(l_SPGdmaStruct->SpRxGdmaInitStruct.GDMA_Index, l_SPGdmaStruct->SpRxGdmaInitStruct.GDMA_ChNum);
 		GDMA_Cmd(l_SPGdmaStruct->SpRxGdmaInitStruct.GDMA_Index, l_SPGdmaStruct->SpRxGdmaInitStruct.GDMA_ChNum, DISABLE);
 

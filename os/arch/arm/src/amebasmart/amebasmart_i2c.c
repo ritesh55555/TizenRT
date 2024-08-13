@@ -830,6 +830,30 @@ static int amebasmart_i2c_isr_process(struct amebasmart_i2c_priv_s *priv)
 	uint8_t read_restart;
 	uint8_t write_restart;
 
+#if 1
+
+		if ((w_msgv->flags & I2C_M_READ) == 0) {
+
+			i2cinfo("i2c writeread writing");
+			printf("i2c writeread writing\n");
+
+			if ((r_msgv->flags & I2C_M_READ) != 0) 
+			{
+				ret = rtk_i2c_write(priv->i2c_object, w_msgv->addr, w_msgv->buffer, w_msgv->length, 0);
+			}
+			else
+			{
+				ret = rtk_i2c_write(priv->i2c_object, w_msgv->addr, w_msgv->buffer, w_msgv->length, 1);
+			}
+		}
+		if (((r_msgv->flags & I2C_M_READ) != 0) && ret!=-1)
+		{
+			printf("i2c writeread reading\n");
+			i2cinfo("i2c writeread reading");
+			ret = rtk_i2c_read(priv->i2c_object, r_msgv->addr, r_msgv->buffer, r_msgv->length, 1);
+		}	
+#else // #if 1, original code
+
 	if ((w_msgv->flags & I2C_M_READ) == 0) {
 
 		i2cinfo("i2c writing");
@@ -854,6 +878,9 @@ static int amebasmart_i2c_isr_process(struct amebasmart_i2c_priv_s *priv)
 		ret = rtk_i2c_read(priv->i2c_object, r_msgv->addr, r_msgv->buffer, r_msgv->length, 1);
 #endif
 	}
+
+#endif // end #if 1, original code
+
 
 #else /* CONFIG_I2C_WRITEREAD */
 

@@ -308,8 +308,10 @@ int rtk_i2c_write(i2c_t *obj, int address, const char *data, int length, int sto
 	}
 
 	if ((!restart_enable) | (1 == stop)) {
+		printf("before i2c master wrtie brk\n");
 		return I2C_MasterWriteBrk(obj->I2Cx, (unsigned char *)data, length);
 	} else {
+		printf("Before i2c_send_restart\n");
 		i2c_send_restart(obj->I2Cx, (unsigned char *)data, length, 1);
 	}
 	return length;

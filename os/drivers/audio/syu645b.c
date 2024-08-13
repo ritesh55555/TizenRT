@@ -86,24 +86,6 @@ static const struct audio_ops_s g_audioops = {
         .release = syu645b_release,             /* release        */
 };
 
-static int syu645b_writereg_3byte(FAR struct syu645b_dev_s *priv, uint8_t regaddr_h, uint8_t regaddr_l , uint8_t regval)
-{
-        int ret;
-        uint8_t reg[3];
-        FAR struct i2c_dev_s *dev = priv->i2c;
-        FAR struct i2c_config_s *syu645b_i2c_config = &(priv->lower->i2c_config);
-
-        reg[0] = regaddr_h;
-        reg[1] = regaddr_l;
-        reg[2] = regval;
-
-        ret = i2c_write(dev, syu645b_i2c_config, (uint8_t *)reg, 3);
-        if (ret < 0) {
-			auddbg("Error, cannot write reg 0x%x/0x%x/0x%x\n", regaddr_h, regaddr_l, regval);
-        }
-        return ret;
-}
-
 /************************************************************************************
  * Name: syu645b_exec_i2c_script
  *
@@ -114,16 +96,67 @@ static int syu645b_writereg_3byte(FAR struct syu645b_dev_s *priv, uint8_t regadd
 
 static int syu645b_exec_i2c_script(FAR struct syu645b_dev_s *priv, t_codec_init_script_entry *script, uint32_t size)
 {
-	uint32_t i;
+        uint32_t i;
         uint16_t ret = 0;
+        uint8_t reg[5];
+        FAR struct i2c_dev_s *dev = priv->i2c;
+        FAR struct i2c_config_s *syu645b_i2c_config = &(priv->lower->i2c_config);
 
-        for (i = 0; i < size; i++) {
-		ret = syu645b_writereg_3byte(priv, script[i].addr_h, script[i].addr_l, script[i].val);
+         for (i = 0; i < size; i++) {
+                reg[0] = script[i].addr;
+                if (script[i].type == SYU645B_REG_D_2BYTE) {
+                        reg[1] = script[i].val[0];
+                } else if (script[i].type == SYU645B_REG_D_3BYTE) {
+                        reg[1] = script[i].val[0];
+                        reg[2] = script[i].val[1];
+                } else if (script[i].type == SYU645B_REG_D_5BYTE) {
+                        reg[1] = script[i].val[0];
+                        reg[2] = script[i].val[1];
+                        reg[3] = script[i].val[2];
+                        reg[4] = script[i].val[3];
+                } else {
+                        auddbg("Error, script type is not supported\n")
+                }
+
+                ret = i2c_write(dev, syu645b_i2c_config, (uint8_t *)reg, script[i].type);
+                if (ret < script[i].type) {
+                        auddbg("Error, cannot write to reg addr 0x%x, ret = %d\n", script[i].addr, ret);
+                        break;
+                }
                 if (script[i].delay > 0) {
-                	up_mdelay(script[i].delay);
+                        up_mdelay(script[i].delay);
                 }
         }
         return ret;
+}
+
+void syu645b_read_register(FAR struct syu645b_dev_s *priv, t_codec_init_script_entry *script) 
+{
+	int ret;
+	FAR struct i2c_dev_s *dev = priv->i2c;
+    FAR struct i2c_config_s *syu645b_i2c_config = &(priv->lower->i2c_config);
+	uint8_t writeReg[1];
+	uint8_t readReg[4];
+	writeReg[0] = script[0].addr;
+	ret = i2c_writeread(dev, syu645b_i2c_config, writeReg, 1, readReg, 1);
+	if (ret < 0) {
+		auddbg("Error, cannot read reg %x\n", writeReg[0]);
+		return FAIL_8;
+	} else {
+		auddbg("ret is %d\n", ret);
+		auddbg("read value from reg is 0x%x\n", readReg[0]);
+	}
+
+	writeReg[0] = script[1].addr;
+	ret = i2c_writeread(dev, syu645b_i2c_config, writeReg, 1, readReg, 1);
+	if (ret < 0) {
+		auddbg("Error, cannot read reg %x\n", writeReg[0]);
+		return FAIL_8;
+	} else {
+		auddbg("ret is %d\n", ret);
+		auddbg("read value from reg is 0x%x\n", readReg[0]);
+	}
+	return;
 }
 
 /************************************************************************************
@@ -167,9 +200,9 @@ static void syu645b_setvolume(FAR struct syu645b_dev_s *priv)
 			syu645b_exec_i2c_script(priv, codec_init_mute_on_script, sizeof(codec_init_mute_on_script) / sizeof(t_codec_init_script_entry));
                 } else {
 			if (priv->volume == 0) {
-				codec_set_master_volume_script[0].val = 0;
+				codec_set_master_volume_script[0].val[0] = 0;
 			} else {
-				codec_set_master_volume_script[0].val = SYU645B_HW_VOL_MAX - (SYU645B_SPK_VOL_MAX - priv->volume) * SYU645B_HW_VOL_STEP;
+				codec_set_master_volume_script[0].val[0] = SYU645B_HW_VOL_MAX - (SYU645B_SPK_VOL_MAX - priv->volume) * SYU645B_HW_VOL_STEP;
 			}
 			syu645b_exec_i2c_script(priv, codec_set_master_volume_script, sizeof(codec_set_master_volume_script) / sizeof(t_codec_init_script_entry));
 		}
@@ -1044,6 +1077,10 @@ FAR struct audio_lowerhalf_s *syu645b_initialize(FAR struct i2c_dev_s *i2c, FAR 
 	/*reconfigure the SYU645B hardware */
 	syu645b_reset_config(priv);
 	syu645b_exec_i2c_script(priv, codec_init_mute_on_script, sizeof(codec_init_mute_on_script) / sizeof(t_codec_init_script_entry));
+
+
+	printf("############################## Before test scritp run ##############################\n");
+	syu645b_read_register(priv, codec_test_script);
 
 #ifndef CONFIG_AUDIO_EXCLUDE_VOLUME
 	priv->volume = SYU645B_SPK_VOL_DEF;

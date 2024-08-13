@@ -100,7 +100,50 @@ static int alc1019_writereg_3byte(FAR struct alc1019_dev_s *priv, uint8_t regadd
         ret = i2c_write(dev, alc1019_i2c_config, (uint8_t *)reg, 3);
         if (ret < 0) {
 			auddbg("Error, cannot write reg 0x%x/0x%x/0x%x\n", regaddr_h, regaddr_l, regval);
-        }
+        } else {
+			printf("write successful with ret is %d\n", ret);
+		}
+
+		uint8_t deviceid[2];
+
+        ret =  i2c_read(dev, alc1019_i2c_config, deviceid, 2);
+        if (ret < 0) {
+			printf("read fail\n");
+                return ERROR;
+        } else {
+			printf("read successfull with ret %d\n", ret);
+		}
+
+        auddbg("read done\n");
+
+        auddbg("read reg value : %x%x\n", deviceid[0], deviceid[1]);
+
+		reg[0] = 0x00;
+        reg[1] = 0x61;
+
+        ret = i2c_write(dev, alc1019_i2c_config, (uint8_t *)reg, 2);
+        if (ret < 0) {
+                auddbg("Error, cannot write reg %x\n", *reg);
+        } else {
+			printf("write succesful with ret is %d\n", ret);
+		}
+
+        auddbg("write done\n");
+
+        //uint8_t deviceid[2];
+
+        ret =  i2c_read(dev, alc1019_i2c_config, deviceid, 2);
+        if (ret < 0) {
+			printf("read fail\n");
+                return ERROR;
+        } else {
+			printf("read successfull with ret %d\n", ret);
+		}
+
+        auddbg("read done\n");
+
+        auddbg("read reg value : %x%x\n", deviceid[0], deviceid[1]);
+
         return ret;
 }
 

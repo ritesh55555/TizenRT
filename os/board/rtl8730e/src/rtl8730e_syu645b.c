@@ -46,13 +46,13 @@ extern FAR struct i2s_dev_s *amebasmart_i2s_initialize(uint16_t port, bool is_re
 #if CONFIG_RTL8730E_BOARD_REVISION >= 5
 #define SYU645B_I2C_PORT		2
 #else
-#define SYU645B_I2C_PORT		1
+#define SYU645B_I2C_PORT		2
 #endif
 
 #define SYU645B_I2C_FREQ		100000
 #define SYU645B_I2C_ADDRLEN		7
 
-#define SYU645B_I2C_ADDR		0x28 
+#define SYU645B_I2C_ADDR		0x2A 
 
 /* i2s config */
 #define SYU645B_I2S_PORT		2

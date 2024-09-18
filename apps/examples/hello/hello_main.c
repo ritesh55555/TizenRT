@@ -56,10 +56,14 @@
 
 #include <tinyara/config.h>
 #include <stdio.h>
+#include <tinyara/fs/mtd.h>
+#include <errno.h>
 
 /****************************************************************************
  * hello_main
  ****************************************************************************/
+int g_lldbg_start = 0;
+int base = 0x0665000;
 
 #ifdef CONFIG_BUILD_KERNEL
 int main(int argc, FAR char *argv[])
@@ -68,5 +72,113 @@ int hello_main(int argc, char *argv[])
 #endif
 {
 	printf("Hello, World!!\n");
+	int ret;
+	long arg = 0;
+
+	if (argc == 2) {
+		char *p;
+    	arg = strtol(argv[1], &p, 10);
+	}
+
+	if (arg == 6) {
+		if (!g_dev_mtd) {
+			g_dev_mtd = up_flashinitialize();
+			if (!g_dev_mtd) {
+				printf("Unable to create up_flashinitilaize\n");
+			} else {
+				printf("g_dev_mtd initialized\n");
+			}
+		}
+	}
+
+	if (arg == 5) {
+		printf("Crash using accessing null pointer\n");
+		int *p = NULL;
+		printf("p value is %d\n", *p);
+	}	
+
+	if (arg == 1) {
+		g_lldbg_start = 1;
+		/*int *ptr = NULL;
+		printf("print %d\n", *ptr);*/
+		lldbg("hi there this is text for testing lldbg getting saved in flash or not!!!\n");
+		lldbg_noarg("Lets see if it gets stored\n");
+		lldbg("have a good day");
+	}
+	if (arg == 2) {
+		/* Read from FLASH */
+		FAR struct mtd_dev_s *dev_mtd = NULL;
+		char *buffer = (char*)malloc(sizeof(char) * 200);
+		int buflen = 0;
+
+		dev_mtd = up_flashinitialize();
+		if (!dev_mtd) {
+			printf("up_flashinitialize failed\n");
+			return 0;
+		}
+		ret = MTD_READ(dev_mtd, base, 200, (const uint8_t *)buffer);
+		if (ret <= 0) {
+			printf("ret from MTD_READ failed %d\n", ret);
+			return 0;
+		}
+		printf("ret from MTD_READ is %d\n", ret);
+		printf("Data read from MTD is as follows:\n");
+		for (int i = 0; i < 200; i++ ){
+			printf("%c", buffer[i]);
+		}
+		printf("\n");
+	}
+	if (arg == 3) {
+		/* Wrtie to FLASH */
+		FAR struct mtd_dev_s *dev_mtd = NULL;
+
+		dev_mtd = up_flashinitialize();
+		if (!dev_mtd) {
+			printf("up_flashinitialize failed\n");
+			return 0;
+		}
+		printf("base is %d\n", (base/4096) + 1);
+		ret = MTD_ERASE(dev_mtd, (base/4096), 2);
+		if (ret < 0) {
+			printf("failed MTD erase ret %d\n", ret);
+			return 0;
+		}
+		printf("ret from MTD_ERASE %d\n", ret);
+		/*ret = MTD_WRITE(dev_mtd, base, 20, (const uint8_t *)buffer);
+		if (ret <= 0) {
+			printf("ret from MTD_WRITE failed %d\n", ret);
+			return 0;
+		}
+		printf("ret from MTD_WRITE is %d\n", ret);
+		printf("Data WROTE to MTD is as follows:\n");
+		for (int i = 0; i < 20; i++ ){
+			printf("%c", buffer[i]);
+		}*/
+		printf("\n");
+	}
+	if (arg == 4) {
+		/* Wrtie to FLASH */
+		FAR struct mtd_dev_s *dev_mtd = NULL;
+		char buffer[] = "my name is ritesh!!!";
+
+		dev_mtd = up_flashinitialize();
+		if (!dev_mtd) {
+			printf("up_flashinitialize failed\n");
+			return 0;
+		}
+		
+		ret = MTD_WRITE(dev_mtd, base, 20, (const uint8_t *)buffer);
+		if (ret <= 0) {
+			printf("ret from MTD_WRITE failed %d\n", ret);
+			return 0;
+		}
+		printf("ret from MTD_WRITE is %d\n", ret);
+		printf("Data WROTE to MTD is as follows:\n");
+		for (int i = 0; i < 20; i++ ){
+			printf("%c", buffer[i]);
+		}
+		printf("\n");
+	}
+	
 	return 0;
 }

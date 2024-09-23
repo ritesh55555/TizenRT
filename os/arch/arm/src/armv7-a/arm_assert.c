@@ -104,6 +104,7 @@
 #include "irq/irq.h"
 #include "task/task.h"
 #include "up_internal.h"
+#include <tinyara/fs/mtd.h>
 
 bool abort_mode = false;
 
@@ -169,7 +170,7 @@ static void up_stackdump(uint32_t sp, uint32_t stack_base)
 			lldbg_noarg(" xxxxxxxx");
 		} else {
 			/* For remaining stack addresses inside allocated stack, print proper stack address values */
-			lldbg_noarg(" %08x", ptr[i]);
+			lldbg(" %08x", ptr[i]);
 		}
 		stack += 4;
 	}
@@ -560,14 +561,20 @@ void up_assert(const uint8_t *filename, int lineno)
 	ARCH_GET_RET_ADDRESS(kernel_assert_location)
 	struct tcb_s *fault_tcb = this_task();
 
+	g_lldbg_start = 1;
+
 	/* Add new line to distinguish between normal log and assert log.*/
 	lldbg_noarg("\n");
+	lldbg_noarg("This is the start crash and lldbg logs to get stored!!!!\n");
+	lldbg_noarg("Some additional logs FLAG1\n");
 
 	board_autoled_on(LED_ASSERTION);
 
 #ifdef CONFIG_SYSTEM_REBOOT_REASON
 	reboot_reason_write_user_intended();
 #endif
+
+	lldbg_noarg("Some additional logs FLAG2\n");
 
 	abort_mode = true;
 
@@ -585,6 +592,8 @@ void up_assert(const uint8_t *filename, int lineno)
 		asserted_location = (uint32_t)kernel_assert_location;
 	}
 
+	lldbg("Some additonal logs FLAG3\n");
+
 	irqstate_t flags = irqsave();
 #ifdef CONFIG_SECURITY_LEVEL
 	lldbg_noarg("security level: %d\n", get_security_level());
@@ -601,6 +610,7 @@ void up_assert(const uint8_t *filename, int lineno)
 
 	/* Closing log line */
 	lldbg_noarg("##########################################################################################################################################\n");
+	g_lldbg_start = 0;
 
 #if defined(CONFIG_BOARD_CRASHDUMP)
 	lldbg_noarg("Perform Crashdump\n");

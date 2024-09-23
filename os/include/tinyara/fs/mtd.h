@@ -96,6 +96,9 @@
  * necessary to make it appear so.
  */
 
+extern int g_lldbg_start;
+extern struct mtd_dev_s *g_dev_mtd;
+
 struct mtd_geometry_s {
 	uint32_t blocksize;		/* Size of one read/write block. */
 	uint32_t erasesize;		/* Size of one erase blocks -- must be a multiple
@@ -197,6 +200,7 @@ extern "C" {
 /****************************************************************************
  * Public Function Prototypes
  ****************************************************************************/
+ssize_t amebasmart_flash_write(size_t addr, const void *buf, size_t length);
 
 /* MTD Support **************************************************************/
 

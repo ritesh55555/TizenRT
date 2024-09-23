@@ -63,6 +63,7 @@
 #include <string.h>
 #include <errno.h>
 #include <debug.h>
+#include <tinyara/fs/mtd.h>
 
 #include <tinyara/irq.h>
 #include <tinyara/arch.h>
@@ -197,6 +198,8 @@
 #define CHAR_TIMEOUT 6540
 #define TX_FIFO_MAX 16
 
+#define MAX_BUFLEN   20
+
 /****************************************************************************
  * Private Types
  ****************************************************************************/
@@ -208,6 +211,11 @@
  * UART3_DEV: hp uart3_bt
  * LOGUART_DEV: KM0 log uart
  */
+
+struct mtd_dev_s *g_dev_mtd = NULL;
+static char buffer[20];
+static int buflen = 0;
+static int offset = 0;
 
 static serial_t* sdrv[MAX_UART_INDEX + 1] = {NULL, NULL, NULL, NULL, NULL}; //uart 0~4, uart4 is configured as log uart
 
@@ -1219,6 +1227,7 @@ static uint32_t rtk_uart_resume(uint32_t expected_idle_time, void *param)
 
 void up_serialinit(void)
 {
+
 #ifdef CONSOLE_DEV
 	CONSOLE_DEV.isconsole = true;
 	rtl8730e_up_setup(&CONSOLE_DEV);
@@ -1250,6 +1259,7 @@ void up_serialinit(void)
 	pmu_register_sleep_callback(PMU_LOGUART_DEVICE, (PSM_HOOK_FUN)rtk_loguart_suspend, NULL, (PSM_HOOK_FUN)rtk_loguart_resume, NULL);
 	pmu_register_sleep_callback(PMU_UART1_DEVICE, (PSM_HOOK_FUN)rtk_uart_suspend, NULL, (PSM_HOOK_FUN)rtk_uart_resume, NULL);
 #endif
+
 }
 
 /****************************************************************************
@@ -1304,6 +1314,19 @@ int up_lowgetc(void)
 	return rxd & 0xff;
 }
 
+int add_to_flash(int ch)
+{
+	if (buflen == MAX_BUFLEN) {
+		int ret = MTD_WRITE(g_dev_mtd, 0x0665000 + offset, buflen, (uint8_t *)buffer);
+		//int ret = amebasmart_flash_write(0x0665000 + offset, (const uint8_t *)buffer, buflen);
+		offset += buflen;
+		buflen = 0;		
+	}
+	buffer[buflen] = ch;
+	buflen++;
+	return buflen;
+}
+
 /****************************************************************************
  * Name: up_putc
  *
@@ -1320,6 +1343,11 @@ int up_lowgetc(void)
 int up_putc(int ch)
 {
 	/* Check for LF */
+
+
+	if (g_lldbg_start) {
+		add_to_flash(ch);
+	}
 
 	if (ch == '\n') {
 		/* Add CR */

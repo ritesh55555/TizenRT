@@ -58,6 +58,7 @@
 #include <stdio.h>
 #include <tinyara/fs/mtd.h>
 #include <errno.h>
+#include <debug.h>
 
 /****************************************************************************
  * hello_main
@@ -88,6 +89,8 @@ int hello_main(int argc, char *argv[])
 			} else {
 				printf("g_dev_mtd initialized\n");
 			}
+		} else {
+			printf("g_dev_mtd already initialized\n");
 		}
 	}
 
@@ -99,16 +102,14 @@ int hello_main(int argc, char *argv[])
 
 	if (arg == 1) {
 		g_lldbg_start = 1;
-		/*int *ptr = NULL;
-		printf("print %d\n", *ptr);*/
-		lldbg("hi there this is text for testing lldbg getting saved in flash or not!!!\n");
-		lldbg_noarg("Lets see if it gets stored\n");
-		lldbg("have a good day");
+		lldbg("This is a test text for lldbg testing of saving in flash\n");
+		lldbg_noarg("second line for testing\n");
+		g_lldbg_start = 0;
 	}
 	if (arg == 2) {
 		/* Read from FLASH */
 		FAR struct mtd_dev_s *dev_mtd = NULL;
-		char *buffer = (char*)malloc(sizeof(char) * 200);
+		char *buffer = (char*)malloc(sizeof(char) * 5000);
 		int buflen = 0;
 
 		dev_mtd = up_flashinitialize();
@@ -116,14 +117,14 @@ int hello_main(int argc, char *argv[])
 			printf("up_flashinitialize failed\n");
 			return 0;
 		}
-		ret = MTD_READ(dev_mtd, base, 200, (const uint8_t *)buffer);
+		ret = MTD_READ(dev_mtd, base, 5000, (const uint8_t *)buffer);
 		if (ret <= 0) {
 			printf("ret from MTD_READ failed %d\n", ret);
 			return 0;
 		}
 		printf("ret from MTD_READ is %d\n", ret);
 		printf("Data read from MTD is as follows:\n");
-		for (int i = 0; i < 200; i++ ){
+		for (int i = 0; i < 5000; i++ ){
 			printf("%c", buffer[i]);
 		}
 		printf("\n");
@@ -138,22 +139,12 @@ int hello_main(int argc, char *argv[])
 			return 0;
 		}
 		printf("base is %d\n", (base/4096) + 1);
-		ret = MTD_ERASE(dev_mtd, (base/4096), 2);
+		ret = MTD_ERASE(dev_mtd, (base/4096), 4);
 		if (ret < 0) {
 			printf("failed MTD erase ret %d\n", ret);
 			return 0;
 		}
 		printf("ret from MTD_ERASE %d\n", ret);
-		/*ret = MTD_WRITE(dev_mtd, base, 20, (const uint8_t *)buffer);
-		if (ret <= 0) {
-			printf("ret from MTD_WRITE failed %d\n", ret);
-			return 0;
-		}
-		printf("ret from MTD_WRITE is %d\n", ret);
-		printf("Data WROTE to MTD is as follows:\n");
-		for (int i = 0; i < 20; i++ ){
-			printf("%c", buffer[i]);
-		}*/
 		printf("\n");
 	}
 	if (arg == 4) {

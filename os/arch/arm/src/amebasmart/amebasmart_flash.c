@@ -174,7 +174,7 @@ static int amebasmart_erase(FAR struct mtd_dev_s *dev, off_t startblock, size_t 
 	return OK;
 }
 
-static ssize_t amebasmart_flash_write(size_t addr, const void *buf, size_t length)
+ssize_t amebasmart_flash_write(size_t addr, const void *buf, size_t length)
 {
 	int32_t result = 0;
 
@@ -186,10 +186,16 @@ static ssize_t amebasmart_flash_write(size_t addr, const void *buf, size_t lengt
 		return -EFAULT;
 	}
 
-	device_mutex_lock(RT_DEV_LOCK_FLASH);
+	if (!g_lldbg_start) {
+		device_mutex_lock(RT_DEV_LOCK_FLASH);
+	}
+	
 	result = flash_stream_write(NULL, addr, length, (u8 *)buf);
-	device_mutex_unlock(RT_DEV_LOCK_FLASH);
 
+	if (!g_lldbg_start) {
+		device_mutex_unlock(RT_DEV_LOCK_FLASH);
+	}
+	
 	if (result < 0) {
 		return -EIO;
 	} else {
@@ -369,7 +375,7 @@ FAR struct mtd_dev_s *up_flashinitialize(void)
 		u8 chip_id[4];
 		flash_read_id(NULL, chip_id, 4);
 
-		lldbg("Manufacturer : %u memory type : %u capacity : %u\n", chip_id[0], chip_id[1], chip_id[2]);
+		//lldbg("Manufacturer : %u memory type : %u capacity : %u\n", chip_id[0], chip_id[1], chip_id[2]);
 		return (FAR struct mtd_dev_s *)priv;
 	}
 #ifdef CONFIG_PM

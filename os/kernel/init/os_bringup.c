@@ -114,6 +114,8 @@
 #include <tinyara/security_level.h>
 #endif
 
+#include <tinyara/log_dump/crash_dump.h>
+
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/

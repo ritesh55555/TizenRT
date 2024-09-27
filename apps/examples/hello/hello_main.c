@@ -59,6 +59,7 @@
 #include <tinyara/fs/mtd.h>
 #include <errno.h>
 #include <debug.h>
+#include <tinyara/log_dump/crash_dump.h>
 
 /****************************************************************************
  * hello_main
@@ -82,7 +83,7 @@ int hello_main(int argc, char *argv[])
 	}
 
 	if (arg == 6) {
-		if (!g_dev_mtd) {
+		/*if (!g_dev_mtd) {
 			g_dev_mtd = up_flashinitialize();
 			if (!g_dev_mtd) {
 				printf("Unable to create up_flashinitilaize\n");
@@ -91,7 +92,8 @@ int hello_main(int argc, char *argv[])
 			}
 		} else {
 			printf("g_dev_mtd already initialized\n");
-		}
+		}*/
+		crash_dump_initialize();
 	}
 
 	if (arg == 5) {
@@ -101,10 +103,12 @@ int hello_main(int argc, char *argv[])
 	}	
 
 	if (arg == 1) {
-		g_lldbg_start = 1;
+		crash_dump_start();
 		lldbg("This is a test text for lldbg testing of saving in flash\n");
-		lldbg_noarg("second line for testing\n");
-		g_lldbg_start = 0;
+		lldbg_noarg("second line for testing ################################!!!!!!!!!!!!!!!!!!!\n");
+		lldbg_noarg("third line for testing ######helooh rfdiofvn dfsdo######!!!!!!!!!!!!!!!!!!!\n");
+		lldbg_noarg("fourth line for testing ###########!!!\n");
+		crash_dump_stop();
 	}
 	if (arg == 2) {
 		/* Read from FLASH */

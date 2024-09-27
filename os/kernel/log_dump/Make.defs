@@ -19,6 +19,7 @@
 ifeq ($(CONFIG_LOG_DUMP),y)
 
 CSRCS += log_dump.c
+CSRCS += crash_dump.c
 
 DEPPATH += --dep-path log_dump
 VPATH += :log_dump

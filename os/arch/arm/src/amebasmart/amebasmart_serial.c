@@ -91,6 +91,8 @@
 #include "osdep_service.h"
 #include "ameba_vector.h"
 
+#include <tinyara/log_dump/crash_dump.h>
+
 /****************************************************************************
  * Preprocessor Definitions
  ****************************************************************************/
@@ -1345,9 +1347,10 @@ int up_putc(int ch)
 	/* Check for LF */
 
 
-	if (g_lldbg_start) {
-		add_to_flash(ch);
-	}
+	// if (g_lldbg_start) {
+	// 	add_to_flash(ch);
+	// }
+	crash_dump_save(ch);
 
 	if (ch == '\n') {
 		/* Add CR */

@@ -105,6 +105,7 @@
 #include "task/task.h"
 #include "up_internal.h"
 #include <tinyara/fs/mtd.h>
+#include <tinyara/log_dump/crash_dump.h>
 
 bool abort_mode = false;
 
@@ -561,7 +562,8 @@ void up_assert(const uint8_t *filename, int lineno)
 	ARCH_GET_RET_ADDRESS(kernel_assert_location)
 	struct tcb_s *fault_tcb = this_task();
 
-	g_lldbg_start = 1;
+	crash_dump_start();
+	//g_lldbg_start = 1;
 
 	/* Add new line to distinguish between normal log and assert log.*/
 	lldbg_noarg("\n");
@@ -601,16 +603,17 @@ void up_assert(const uint8_t *filename, int lineno)
 	/* Print assert detail information and dump state,
 	 * but if os security level is high, It is not printed.
 	 */
-	if (!IS_SECURE_STATE()) {
+	//if (!IS_SECURE_STATE()) {
 		print_assert_detail(filename, lineno, fault_tcb, asserted_location);
-	}
+	//}
 
 	/* Heap corruption check */
 	check_heap_corrupt(fault_tcb);
 
 	/* Closing log line */
 	lldbg_noarg("##########################################################################################################################################\n");
-	g_lldbg_start = 0;
+	crash_dump_stop();
+	//g_lldbg_start = 0;
 
 #if defined(CONFIG_BOARD_CRASHDUMP)
 	lldbg_noarg("Perform Crashdump\n");

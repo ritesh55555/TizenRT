@@ -117,11 +117,11 @@ bool sched_removereadytorun(FAR struct tcb_s *rtcb)
 
 #ifdef CONFIG_SW_STACK_OVERFLOW_DETECTION
 	if (*(uint32_t *)(rtcb->stack_base_ptr) != STACK_COLOR) {
-		dbg_noarg("###############    STACK OVERFLOW at pid %d ", rtcb->pid);
+		lldbg_noarg("###############    STACK OVERFLOW at pid %d ", rtcb->pid);
 #if CONFIG_TASK_NAME_SIZE > 0
-		dbg_noarg("(%s) ", rtcb->name);
+		lldbg_noarg("(%s) ", rtcb->name);
 #endif
-		dbg_noarg("###################\n");
+		lldbg_noarg("###################\n");
 		PANIC();
 	}
 #endif
@@ -158,11 +158,11 @@ bool sched_removereadytorun(FAR struct tcb_s *rtcb)
 
 #ifdef CONFIG_SW_STACK_OVERFLOW_DETECTION
 	if (*(uint32_t *)(rtcb->stack_base_ptr) != STACK_COLOR) {
-		dbg_noarg("###############    STACK OVERFLOW at pid %d ", rtcb->pid);
+		lldbg_noarg("###############    STACK OVERFLOW at pid %d ", rtcb->pid);
 #if CONFIG_TASK_NAME_SIZE > 0
-		dbg_noarg("(%s) ", rtcb->name);
+		lldbg_noarg("(%s) ", rtcb->name);
 #endif
-		dbg_noarg("###################\n");
+		lldbg_noarg("###################\n");
 		PANIC();
 	}
 #endif

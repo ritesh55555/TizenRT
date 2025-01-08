@@ -129,6 +129,8 @@ static bool compress_last_block;
 
 int log_dump_init(void)
 {
+	//recursion();
+	
 	sq_init(&log_dump_chunks);
 	/* no chunks are present so we allocate new chunk */
 	struct log_dump_chunk_s *node = (struct log_dump_chunk_s *)kmm_malloc(LOG_CHUNK_SIZE);

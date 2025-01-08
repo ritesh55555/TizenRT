@@ -55,7 +55,68 @@
  ****************************************************************************/
 
 #include <tinyara/config.h>
+#include <tinyara/sched.h>
+#include <tinyara/arch.h>
 #include <stdio.h>
+#include <mqueue.h>
+#include <errno.h>
+#include <debug.h>
+#include <fcntl.h>
+
+void fun(int size) {
+	volatile int a[size];
+	for (int i = 0; i < size; i++) {
+		a[i] = 99999;
+	}
+}
+
+void recursion() {
+	volatile int a[500];
+	int cnt = 0;
+	int r = 0;
+	while(1) {
+		printf("stack base ptr of recursive thread before alloc is %p\n", *(uint32_t *)(sched_self()->stack_base_ptr));
+		if (*(uint32_t *)(sched_self()->stack_base_ptr) != STACK_COLOR) {
+			printf("stack base ptr of recursive thread before alloc is %p\n", *(uint32_t *)(sched_self()->stack_base_ptr));
+			printf("stack base ptr of recursive thread before alloc is %p\n", *(uint32_t *)(sched_self()->stack_base_ptr));
+			printf("stack base ptr of recursive thread before alloc is %p\n", *(uint32_t *)(sched_self()->stack_base_ptr));
+			printf("stack base ptr of recursive thread before alloc is %p\n", *(uint32_t *)(sched_self()->stack_base_ptr));
+			printf("stack base ptr of recursive thread before alloc is %p\n", *(uint32_t *)(sched_self()->stack_base_ptr));
+			sleep(1);
+		}
+		for (int i = 0; i < 500; i++) {
+			a[i] = 99999;
+		}
+		printf("stack base ptr of recursive thread after alloc is %p\n", *(uint32_t *)(sched_self()->stack_base_ptr));
+		//printf("data in recursive thread is filled with cnt %d\n", cnt+1);
+		for (int i = 1 ; i < 10000000; i++) {
+			for (int j = 1 ; j < 10000000; j++) {
+				for (int k = 1; k < 1000000; k++) {
+					r++;
+				}
+			}
+		}
+		printf("cycle in recursive thread done with cnt %d\n", cnt);
+		fun(cnt);
+		cnt++;
+	}
+}
+
+void normal_thread() {
+	int r = 0;
+	while(1) {
+		//do nothing
+		for (int i = 1 ; i < 10000000; i++) {
+			for (int j = 1 ; j < 10000000; j++) {
+				for (int k = 1; k < 1000000; k++) {
+					r++;
+				}
+			}
+		}
+		printf("cycle in normal thread done\n");
+		printf("stack base ptr of normal thread is %p\n", *(uint32_t *)(sched_self()->stack_base_ptr));
+	}
+}
 
 /****************************************************************************
  * hello_main
@@ -68,5 +129,20 @@ int hello_main(int argc, char *argv[])
 #endif
 {
 	printf("Hello, World!!\n");
+	//recursion();
+
+	if (argc == 2) {
+		int *p = (int *)malloc(sizeof(int) * 10);
+		int pid = kernel_thread("normal_thread", 200, 4096, normal_thread, NULL);
+		if (pid < 0) {
+			printf("Failed to start normal_thread");
+		}
+		int *pl = (int *)malloc(sizeof(int) * 10);
+		int pdid = kernel_thread("recusrsive_thread", 200, 4096, recursion, NULL);
+		if (pdid < 0) {
+			printf("Failed to start recursive_thread");
+		}
+	}
+
 	return 0;
 }

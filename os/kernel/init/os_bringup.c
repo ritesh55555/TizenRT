@@ -244,6 +244,21 @@ static inline void os_workqueues(void)
 
 #endif							/* CONFIG_SCHED_WORKQUEUE */
 
+// int fib(int n) {
+// 	if (n < 2) {
+// 		sleep(1);
+// 		return 1;
+// 	}
+// 	int a = 3;
+// 	int b = 5;
+// 	return fib(n-1) + fib(n-2);
+// }
+
+// void recursion() {
+// 	int ans = fib(1000);
+// 	dbg("##########*********************############ ANSWER of recursion is %d #################**********************#############\n", ans);
+// }
+
 /****************************************************************************
  * Name: os_start_application
  *

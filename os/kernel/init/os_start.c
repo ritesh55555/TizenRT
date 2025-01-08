@@ -381,6 +381,8 @@ static FAR char *g_idleargv[CONFIG_SMP_NCPUS][2];
  * Private Function Prototypes
  ****************************************************************************/
 
+
+
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
@@ -852,6 +854,11 @@ void os_start(void)
 	/* When control is return to this point, the system is idle. */
 
 	svdbg("CPU0: Beginning Idle Loop\n");
+	// int *p = (int *)malloc(sizeof(int) * 10);
+	// int pid = kernel_thread("recusrsive_thread", 200, 4096, recursion, NULL);
+	// if (pid < 0) {
+	// 	printf("Failed to start log dump");
+	// }
 	for (;;) {
 		/* Perform garbage collection (if it is not being done by the worker
 		 * thread).  This cleans-up memory de-allocations that were queued
@@ -874,6 +881,12 @@ void os_start(void)
 
 		sched_garbagecollection();
 #endif
+		/*dbg("Hi there Its Ritesh##############################################\n");
+		//recursion();
+		int pid = kernel_thread("recursive_thread", 200, 4096, recursion, NULL);
+		if (pid < 0) {
+			printf("Failed to start log dump");
+		}*/
 
 #ifdef CONFIG_PM
 		/* Perform PM idle operation to save power */

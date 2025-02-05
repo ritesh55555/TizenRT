@@ -73,6 +73,8 @@
 #include <tinyara/mm/mm.h>
 #endif
 
+#include <string.h>
+
 /************************************************************************
  * Name:  sched_releasepid
  *
@@ -153,7 +155,7 @@ int sched_releasetcb(FAR struct tcb_s *tcb, uint8_t ttype)
 				timer_deleteall(tcb->pid);
 			}
 #endif
-
+			sched_addDeadtaskinfo(tcb->pid, tcb->name);
 			sched_releasepid(tcb->pid);
 		}
 
@@ -206,8 +208,6 @@ int sched_releasetcb(FAR struct tcb_s *tcb, uint8_t ttype)
 
 		group_leave(tcb);
 #endif
-
-		/* And, finally, release the TCB itself */
 
 		sched_kfree(tcb);
 	}

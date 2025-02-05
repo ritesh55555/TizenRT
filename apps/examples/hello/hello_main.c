@@ -56,6 +56,26 @@
 
 #include <tinyara/config.h>
 #include <stdio.h>
+#include <tinyara/arch.h>
+#include <tinyara/sched.h>
+
+void thread1_task(void)
+{
+	//do nothing
+	printf("Inside thread1_task\n");
+	/*for (int i = 0; i < CONFIG_MAX_TASKS; i++) {
+		printf("%d  ->  %s\n", pid_to_task_name[i]);
+	}
+	printf("Task name print done\n");*/
+}
+
+void thread2_task(void)
+{
+	//do nothing
+	printf("Inside thread2_task\n");
+	int *p = (int *)malloc(sizeof(int) * 1024 * 100 * 100 * 1024);
+	printf("Memory allocated wihtout freeing\n");
+}
 
 /****************************************************************************
  * hello_main
@@ -68,5 +88,51 @@ int hello_main(int argc, char *argv[])
 #endif
 {
 	printf("Hello, World!!\n");
+
+	pthread_t thread1;
+	pthread_t thread2;
+	
+	// if (argc == 2) {
+	// 	pthread_create(&thread2, NULL, thread2_task, NULL);
+	// } else {
+	// 	pthread_create(&thread1, NULL, thread1_task, NULL);
+	// }
+
+	if (argc == 2) {
+		//do nothing
+		sched_addDeadtaskinfo(50, "ritesh");
+		sched_addDeadtaskinfo(51, "manoj");
+		sched_addDeadtaskinfo(52, "aditya");
+		sched_addDeadtaskinfo(53, "ritesh");
+		sched_addDeadtaskinfo(54, "aditya");
+		sched_addDeadtaskinfo(55, "ranjan");
+		sched_addDeadtaskinfo(60, "anirudh");
+		sched_addDeadtaskinfo(61, "anirudh");
+
+		print_dead_structure();
+
+		printf("Trying to get some name of dead pid:\n");
+		printf("50 -> %s\n", sched_getdeadtaskname(50));
+		printf("60 -> %s\n", sched_getdeadtaskname(60));
+		printf("53 -> %s\n", sched_getdeadtaskname(53));
+		printf("3 -> %s\n", sched_getdeadtaskname(3));
+		printf("1000 -> %s\n", sched_getdeadtaskname(1000));
+		printf("\n");
+
+		printf("Replaceing some dead pid (53, 51, 1000, 2, 1) if present\n");
+		sched_checkDeadPid(53);
+		sched_checkDeadPid(51);
+		sched_checkDeadPid(1000);
+		sched_checkDeadPid(2);
+		sched_checkDeadPid(1);
+
+		print_dead_structure();
+
+	}
+
+	if (argc == 3) {
+		pthread_create(&thread2, NULL, thread2_task, NULL);
+	}
+
 	return 0;
 }

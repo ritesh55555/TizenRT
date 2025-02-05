@@ -932,6 +932,12 @@ void task_starthook(FAR struct task_tcb_s *tcb, starthook_t starthook, FAR void 
  */
 #endif
 
+void sched_deadtasklistinit();
+void print_dead_structure();
+void sched_addDeadtaskinfo(int pid, char *name);
+char *sched_getdeadtaskname(int pid);
+void *sched_checkDeadPid(int pid);
+
 /********************************************************************************
  * Internal vfork support.  The overall sequence is:
  *

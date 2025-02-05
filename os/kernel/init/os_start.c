@@ -656,6 +656,8 @@ void os_start(void)
 	}
 #endif
 
+	sched_deadtasklistinit();
+
 	/* Disables context switching because we need take the memory manager
 	 * semaphore on this CPU so that it will not be available on the other
 	 * CPUs until we have finished initialization.

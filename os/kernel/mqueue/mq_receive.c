@@ -132,6 +132,9 @@
 
 ssize_t mq_receive(mqd_t mqdes, FAR char *msg, size_t msglen, FAR int *prio)
 {
+	size_t address;
+	ARCH_GET_RET_ADDRESS(address);
+
 	FAR struct mqueue_msg_s *mqmsg;
 	irqstate_t saved_state;
 	ssize_t ret = ERROR;
@@ -165,6 +168,10 @@ ssize_t mq_receive(mqd_t mqdes, FAR char *msg, size_t msglen, FAR int *prio)
 
 	saved_state = enter_critical_section();
 
+	mqdes->mq_ptr->curr_type = MQ_RECEIVE;
+	mqdes->mq_ptr->curr_type_call_addr = address;
+	mqdes->mq_ptr->is_waiting = true;
+
 	/* Get the message from the message queue */
 
 	mqmsg = mq_waitreceive(mqdes);
@@ -181,6 +188,10 @@ ssize_t mq_receive(mqd_t mqdes, FAR char *msg, size_t msglen, FAR int *prio)
 
 	if (mqmsg) {
 		ret = mq_doreceive(mqdes, mqmsg, msg, prio);
+
+		mqdes->mq_ptr->curr_type = MQ_NONE;
+		mqdes->mq_ptr->receive_cnt++;
+		mqdes->mq_ptr->is_waiting = false;
 	}
 
 	leave_cancellation_point();

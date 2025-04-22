@@ -137,6 +137,9 @@
 
 int mq_send(mqd_t mqdes, FAR const char *msg, size_t msglen, int prio)
 {
+	size_t address;
+	ARCH_GET_RET_ADDRESS(address);
+
 	FAR struct mqueue_inode_s *msgq;
 	FAR struct mqueue_msg_s *mqmsg = NULL;
 	irqstate_t saved_state;
@@ -166,6 +169,11 @@ int mq_send(mqd_t mqdes, FAR const char *msg, size_t msglen, int prio)
 	 */
 
 	saved_state = enter_critical_section();
+
+	mqdes->mq_ptr->curr_type = MQ_SEND;
+	mqdes->mq_ptr->curr_type_call_addr = address;
+	mqdes->mq_ptr->is_waiting = true;
+
 	if (up_interrupt_context() ||	/* In an interrupt handler */
 		msgq->nmsgs < msgq->maxmsgs ||	/* OR Message queue not full */
 		mq_waitsend(mqdes) == OK) {	/* OR Successfully waited for mq not full */
@@ -195,6 +203,10 @@ int mq_send(mqd_t mqdes, FAR const char *msg, size_t msglen, int prio)
 		/* Yes, perform the message send. */
 
 		ret = mq_dosend(mqdes, mqmsg, msg, msglen, prio);
+
+		mqdes->mq_ptr->curr_type = MQ_NONE;
+		mqdes->mq_ptr->send_cnt++;
+		mqdes->mq_ptr->is_waiting = false;
 	}
 
 	sched_unlock();

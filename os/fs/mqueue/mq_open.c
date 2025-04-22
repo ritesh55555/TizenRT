@@ -69,6 +69,9 @@
 #include "inode/inode.h"
 #include "mqueue/mqueue.h"
 
+extern struct mq_debug_info g_mq_debug_info[];
+extern int mq_debug_cnt;
+
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
@@ -104,6 +107,9 @@
 
 mqd_t mq_open(FAR const char *mq_name, int oflags, ...)
 {
+	size_t open_address;
+	ARCH_GET_RET_ADDRESS(open_address);
+
 	FAR struct inode *inode;
 	FAR const char *relpath = NULL;
 	FAR struct mqueue_inode_s *msgq;
@@ -220,6 +226,13 @@ mqd_t mq_open(FAR const char *mq_name, int oflags, ...)
 
 		inode->i_crefs = 1;
 	}
+
+	g_mq_debug_info[mq_debug_cnt].mq_des = mqdes;
+	g_mq_debug_info[mq_debug_cnt].pid = getpid();
+	g_mq_debug_info[mq_debug_cnt].curr_type = MQ_NONE;
+	g_mq_debug_info[mq_debug_cnt].open_call_addr = open_address;
+	mqdes->mq_ptr = &g_mq_debug_info[mq_debug_cnt];
+	mq_debug_cnt++;
 
 	sched_unlock();
 	return mqdes;

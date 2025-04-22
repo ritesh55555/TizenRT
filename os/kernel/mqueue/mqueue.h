@@ -96,6 +96,9 @@
  * Public Type Definitions
  ****************************************************************************/
 
+extern struct mq_debug_info g_mq_debug_info[];
+extern int mq_debug_cnt;
+
 enum mqalloc_e {
 	MQ_ALLOC_FIXED = 0,			/* pre-allocated; never freed */
 	MQ_ALLOC_DYN,				/* dynamically allocated; free when unused */

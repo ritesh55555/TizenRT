@@ -106,6 +106,25 @@ struct mq_des {
 	FAR struct mq_des *flink;	/* Forward link to next message descriptor */
 	FAR struct mqueue_inode_s *msgq;	/* Pointer to associated message queue */
 	int oflags;					/* Flags set when message queue was opened */
+
+	struct mq_debug_info *mq_ptr;
+};
+
+enum mq_type {
+	MQ_NONE = 0,
+	MQ_SEND,
+	MQ_RECEIVE
+};
+
+struct mq_debug_info {
+	struct mq_des *mq_des;
+	int pid;
+	size_t open_call_addr;
+	int curr_type;
+	size_t curr_type_call_addr;
+	bool is_waiting;
+	int send_cnt;
+	int receive_cnt;
 };
 
 /****************************************************************************

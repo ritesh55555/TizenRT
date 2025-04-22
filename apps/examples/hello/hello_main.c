@@ -56,6 +56,20 @@
 
 #include <tinyara/config.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include <tinyara/fs/ioctl.h>
+#include <sys/types.h>
+#include <tinyara/mminfo.h>
+#include <debug.h>
+#include <tinyara/mqueue.h>
+
+#define MQ_NONE_STR  "none"
+#define MQ_SEND_STR  "send"
+#define MQ_RECEIVE_STR  "receive"
+
+extern struct mq_debug_info g_mq_debug_info[CONFIG_MAX_TASKS];
+extern int mq_debug_cnt;
+
 
 /****************************************************************************
  * hello_main
@@ -68,5 +82,24 @@ int hello_main(int argc, char *argv[])
 #endif
 {
 	printf("Hello, World!!\n");
+
+	if (argc == 2) {
+		printf("Printing g_mq_debug_info list data:\n\n");
+
+		printf("  mq_des     |  name       | thread pid | open address |  mq_type  | mq_type_call_addr | is waiting | send cnt | recv cnt  \n");
+		printf("*****************************************************************************************************************************\n");
+		for (int i = 0; i < mq_debug_cnt; i++) {
+			char *str;
+			if (g_mq_debug_info[i].curr_type == MQ_NONE) {
+				str = MQ_NONE_STR;
+			} else if (g_mq_debug_info[i].curr_type == MQ_SEND) {
+				str = MQ_SEND_STR;
+			} else {
+				str = MQ_RECEIVE_STR;
+			}
+			printf(" %p  |  %-10s | %-10d |  0x%08x  |  %-8s |    0x%08x     |  %-8s  | %-7d  | %-8d \n", g_mq_debug_info[i].mq_des, g_mq_debug_info[i].mq_des->msgq->inode->i_name, g_mq_debug_info[i].pid, g_mq_debug_info[i].open_call_addr, str, g_mq_debug_info[i].curr_type_call_addr, g_mq_debug_info[i].is_waiting == true ? "yes" : "no", g_mq_debug_info[i].send_cnt, g_mq_debug_info[i].receive_cnt);
+		}
+	}
+
 	return 0;
 }

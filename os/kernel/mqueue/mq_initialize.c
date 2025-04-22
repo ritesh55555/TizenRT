@@ -121,6 +121,9 @@ static struct mqueue_msg_s *g_msgfreeirqalloc;
 
 static sq_queue_t g_desalloc;
 
+struct mq_debug_info g_mq_debug_info[CONFIG_MAX_TASKS];
+int mq_debug_cnt;
+
 /************************************************************************
  * Private Functions
  ************************************************************************/
@@ -200,6 +203,9 @@ void mq_initialize(void)
 	/* Allocate a block of message queue descriptors */
 
 	mq_desblockalloc();
+
+	mq_debug_cnt = 0;
+	memset(g_mq_debug_info, 0, CONFIG_MAX_TASKS * sizeof(struct mq_debug_info));
 }
 
 /************************************************************************
